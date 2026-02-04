@@ -13,13 +13,24 @@ class dashboardController extends Controller
     {
         return view("dashboard.index");
     }
-
+    public function product()
+    {
+        return view("dashboard.product");
+    }
+    public function orders()
+    {
+        return view("dashboard.orders");
+    }
+public function users()
+    {
+        return view("dashboard.users");
+    }
     /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
-        //
+        
     }
 
     /**
