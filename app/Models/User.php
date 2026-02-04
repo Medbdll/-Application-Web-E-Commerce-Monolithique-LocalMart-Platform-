@@ -20,6 +20,7 @@ class User extends Authenticatable
     use HasProfilePhoto;
     use HasTeams;
     use Notifiable;
+    use HasRoles;
     use TwoFactorAuthenticatable;
 
     /**
