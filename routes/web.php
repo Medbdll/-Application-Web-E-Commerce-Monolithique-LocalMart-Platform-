@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\dashboardController;
+use App\Http\Controllers\ProductController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -22,3 +23,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
     Route::get('/dashboard/orders', [dashboardController::class, 'orders'])->name('orders');
     Route::get('/dashboard/users', [dashboardController::class, 'users'])->name('users');
 });
+
+Route::resource('products', ProductController::class)->middleware('auth');
+
+
+
