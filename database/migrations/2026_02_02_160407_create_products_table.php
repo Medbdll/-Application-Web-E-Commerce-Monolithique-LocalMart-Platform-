@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description');
+            $table->string('image')->nullable();
             $table->decimal('price', 10, 2);
             $table->unsignedInteger('stock');
             $table->enum('status', ['active', 'inactive', 'draft', 'out_of_stock'])->default('active');
