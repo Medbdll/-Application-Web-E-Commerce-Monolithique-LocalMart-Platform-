@@ -68,8 +68,7 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-
-    protected static function boot()
+protected static function boot()
     {
         parent::boot();
 
@@ -77,7 +76,6 @@ class User extends Authenticatable
             $user->assignRole('client');
         });
     }
-
     // Relationships
     public function orders()
     {
