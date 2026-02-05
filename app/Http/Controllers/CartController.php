@@ -2,64 +2,93 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use App\Models\Cart;
+use App\Models\CartItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $user = Auth::user();
+        $cart = Cart::where('user_id', $user->id)->with('items.product')->first();
+        
+        if (!$cart) {
+            $cart = Cart::create(['user_id' => $user->id]);
+        }
+
+        $subtotal = 0;
+        $totalItems = 0;
+        
+        foreach ($cart->items as $item) {
+            $subtotal += $item->price * $item->quantity;
+            $totalItems += $item->quantity;
+        }
+        
+        $shipping = $subtotal > 0 ? 0 : 0;
+        $tax = $subtotal * 0.096; 
+        $total = $subtotal + $shipping + $tax;
+
+        return view('client.cart', compact('cart', 'subtotal', 'shipping', 'tax', 'total', 'totalItems'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function add(Request $request, Product $product)
     {
-        //
+        $user = Auth::user();
+        
+        $cart = Cart::where('user_id', $user->id)->first();
+        if (!$cart) {
+            $cart = Cart::create(['user_id' => $user->id]);
+        }
+
+        $cartItem = CartItem::where('cart_id', $cart->id)
+                           ->where('product_id', $product->id)
+                           ->first();
+
+        if ($cartItem) {
+            $cartItem->quantity += 1;
+            $cartItem->save();
+        } else {
+            CartItem::create([
+                'cart_id' => $cart->id,
+                'product_id' => $product->id,
+                'quantity' => 1,
+                'price' => $product->price,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Product added to cart successfully!');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function update(Request $request, CartItem $cartItem)
     {
-        //
+        $request->validate([
+            'quantity' => 'required|integer|min:1'
+        ]);
+
+        $cartItem->quantity = $request->quantity;
+        $cartItem->save();
+
+        return redirect()->route('cart.index')->with('success', 'Cart updated successfully!');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Cart $cart)
+    public function remove(CartItem $cartItem)
     {
-        //
+        $cartItem->delete();
+        return redirect()->route('cart.index')->with('success', 'Item removed from cart!');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Cart $cart)
+    public function clear()
     {
-        //
-    }
+        $user = Auth::user();
+        $cart = Cart::where('user_id', $user->id)->first();
+        
+        if ($cart) {
+            $cart->items()->delete();
+        }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Cart $cart)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Cart $cart)
-    {
-        //
+        return redirect()->route('cart.index')->with('success', 'Cart cleared successfully!');
     }
 }
