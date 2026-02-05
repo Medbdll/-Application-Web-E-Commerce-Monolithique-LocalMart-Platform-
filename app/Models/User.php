@@ -69,6 +69,15 @@ class User extends Authenticatable
         ];
     }
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($user) {
+            $user->assignRole('client');
+        });
+    }
+
     // Relationships
     public function orders()
     {
