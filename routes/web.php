@@ -1,9 +1,12 @@
 <?php
 
+<<<<<<< HEAD
 use App\Http\Controllers\CategoryController;
 use Illuminate\Foundation\Application;
+=======
+>>>>>>> 79e6980ad21edccf57940a0de1260c993302c4bb
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\dashboardController;
 use App\Http\Controllers\ProductController;
@@ -11,14 +14,15 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\ProfileController;
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
+  if(Auth::check() && Auth::user()->hasRole(['admin', 'seller','moderator'])) {
+    return redirect()->route('dashboard');
+  }
+  if(Auth::check() && Auth::user()->hasRole('client')) {
+    return redirect()->route('home');
+  }
+  return redirect()->route('login');
 });
-Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified', 'role:admin|seller'])->group(function () {
+Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified', 'role:admin|seller|moderator'])->group(function () {
     Route::get('/dashboard', [dashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/product', [dashboardController::class, 'product'])->name('product');
     Route::get('/dashboard/orders', [dashboardController::class, 'orders'])->name('orders');
