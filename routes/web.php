@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -22,12 +23,12 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
     Route::get('/dashboard/product', [dashboardController::class, 'product'])->name('product');
     Route::get('/dashboard/orders', [dashboardController::class, 'orders'])->name('orders');
     Route::get('/dashboard/users', [dashboardController::class, 'users'])->name('users');
-    
+
     // Profile routes for dashboard
     Route::get('/dashboard/profile', [ProfileController::class, 'edit'])->name('dashboard.profile.edit');
     Route::put('/dashboard/profile', [ProfileController::class, 'update'])->name('dashboard.profile.update');
     Route::delete('/dashboard/profile', [ProfileController::class, 'destroy'])->name('dashboard.profile.destroy');
-    
+
 });
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified', 'role:client'])->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
@@ -36,7 +37,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
     Route::put('/cart/{cartItem}', [CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/{cartItem}', [CartController::class, 'remove'])->name('cart.remove');
     Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
-    
+
     // Profile routes for client
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -44,3 +45,4 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
 });
 
 Route::resource('products', ProductController::class)->middleware('auth');
+Route::resource('categories', CategoryController::class)->middleware('auth');
