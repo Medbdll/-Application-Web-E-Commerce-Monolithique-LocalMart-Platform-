@@ -20,7 +20,7 @@ Route::get('/', function () {
 });
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified', 'role:admin|seller'])->group(function () {
     Route::get('/dashboard', [dashboardController::class, 'index'])->name('dashboard');
-    Route::get('/dashboard/product', [dashboardController::class, 'product'])->name('product');
+    Route::get('/dashboard/product', [ProductController::class, 'index'])->name('product');
     Route::get('/dashboard/orders', [dashboardController::class, 'orders'])->name('orders');
     Route::get('/dashboard/users', [dashboardController::class, 'users'])->name('users');
 
@@ -46,3 +46,4 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
 
 Route::resource('products', ProductController::class)->middleware('auth');
 Route::resource('categories', CategoryController::class)->middleware('auth');
+Route::resource('admin/products' , ProductController::class)->middleware('auth');

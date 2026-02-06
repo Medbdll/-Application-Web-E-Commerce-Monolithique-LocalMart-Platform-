@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -19,29 +20,44 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-
         $term = $request->input('term');
 
         if (auth()->user()->hasRole(['client', 'moderator', 'admin'])) {
-            $this->authorize('viewAny', Product::class);
-
-            $query = Product::query();
+            $query = Product::with(['user', 'category']);
             if ($term) {
                 $query->where('name', 'like', "%{$term}%")
                     ->orWhere('description', 'like', "%{$term}%");
             }
-            $products = $query->latest()->get();
+            $products = $query->latest()->get()->map(function($product) {
+                return (object)[
+                    'name' => $product->name,
+                    'sku' => 'SKU-' . $product->id,
+                    'image' => $product->image,
+                    'category' => $product->category->name ?? 'Uncategorized',
+                    'condition' => $product->status === 'active' ? 'New' : 'Pre-Owned',
+                    'seller_name' => $product->user->name ?? 'Unknown',
+                    'seller_avatar' => null,
+                    'seller_verified' => $product->user->hasRole('admin'),
+                    'seller_type' => $product->user->hasRole('admin') ? 'Verified Partner' : 'Community Seller',
+                    'seller_rating' => 5,
+                    'seller_sales' => rand(10, 5000),
+                    'price' => $product->price,
+                    'price_type' => 'Retail Price',
+                    'stock' => $product->stock,
+                    'status' => $product->status,
+                    'listed_at' => $product->created_at->diffForHumans(),
+                ];
+            });
 
             if ($request->ajax()) {
                 return response()->json($products);
             }
-            return view('client.index', compact('products'));
+
+            return view('dashboard.product', compact('products'));
         }
 
         if (auth()->user()->hasRole('seller')) {
-            $this->authorize('viewAny', Product::class);
-
-            $query = Product::where('user_id', auth()->id());
+            $query = Product::where('user_id', auth()->id())->with(['user', 'category']);
             if ($term) {
                 $query->where(function ($q) use ($term) {
                     $q->where('name', 'like', "%{$term}%")
