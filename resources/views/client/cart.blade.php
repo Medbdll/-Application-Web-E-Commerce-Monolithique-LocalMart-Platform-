@@ -41,7 +41,7 @@
                                     <form action="{{ route('cart.remove', $item->id) }}" method="POST" onsubmit="return confirm('Are you sure?')" class="self-center sm:self-auto">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="text-gray-600 hover:text-red-500 transition-all duration-300 hover:scale-110 group/delete:hover:rotate-12">
+                                        <button type="submit" class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors duration-200">
                                             <i class="fa-solid fa-trash-can"></i>
                                         </button>
                                     </form>
@@ -51,9 +51,13 @@
                                     <form action="{{ route('cart.update', $item->id) }}" method="POST" class="flex items-center justify-center sm:justify-start border border-gray-800 rounded-sm hover:border-vortexGreen/30 transition-colors duration-300 group/quantity">
                                         @csrf
                                         @method('PUT')
-                                        <button type="button" onclick="decrementQuantity(this)" class="px-2 sm:px-3 py-1 text-gray-400 hover:bg-gray-800 hover:text-vortexGreen transition-all duration-300 hover:scale-110">-</button>
-                                        <input type="text" name="quantity" value="{{ $item->quantity }}" min="1" max="99" pattern="[0-9]+" inputmode="numeric" class="px-2 sm:px-4 py-1 text-white font-bold border-x border-gray-800 bg-transparent w-12 sm:w-16 text-center group/quantity:focus:border-vortexGreen/50 focus:outline-none transition-colors duration-300" onkeypress="return event.charCode >= 48 && event.charCode <= 57" oninput="validateQuantity(this)">
-                                        <button type="button" onclick="incrementQuantity(this)" class="px-2 sm:px-3 py-1 text-vortexGreen hover:bg-gray-800 transition-all duration-300 hover:scale-110">+</button>
+                                        <button type="button" onclick="decrementQuantity(this)" class="px-3 py-1 text-gray-400 hover:text-white hover:bg-gray-700 transition-colors duration-200">
+                                            <i class="fa-solid fa-minus text-sm"></i>
+                                        </button>
+                                        <input type="text" name="quantity" value="{{ $item->quantity }}" min="1" max="99" pattern="[0-9]+" inputmode="numeric" class="px-3 py-1 text-white font-bold bg-gray-800 w-16 text-center focus:outline-none focus:ring-2 focus:ring-vortexGreen" onkeypress="return event.charCode >= 48 && event.charCode <= 57" oninput="validateQuantity(this)">
+                                        <button type="button" onclick="incrementQuantity(this)" class="px-3 py-1 text-vortexGreen hover:text-white hover:bg-gray-700 transition-colors duration-200">
+                                            <i class="fa-solid fa-plus text-sm"></i>
+                                        </button>
                                         <button type="submit" class="hidden"></button>
                                     </form>
                                     <div class="text-center sm:text-right">
@@ -68,7 +72,7 @@
                         <i class="fa-solid fa-shopping-cart text-6xl text-gray-700 mb-4 group-hover:text-vortexGreen/50 transition-colors duration-300"></i>
                         <h3 class="text-xl font-display font-bold text-white uppercase mb-2">Your Arsenal is Empty</h3>
                         <p class="text-gray-400 mb-6">Start building your gaming setup</p>
-                        <a href="{{ route('home') }}" class="inline-flex items-center gap-2 bg-vortexGreen text-black font-display font-black py-3 px-6 uppercase tracking-[0.2em] hover:bg-white hover:scale-105 hover:shadow-[0_0_20px_rgba(57,255,20,0.3)] transition-all duration-300">
+                        <a href="{{ route('home') }}" class="inline-flex items-center gap-2 bg-vortexGreen hover:bg-white text-black font-display font-bold py-3 px-6 rounded-lg transition-all duration-300 hover:shadow-lg hover:scale-105">
                             <i class="fa-solid fa-arrow-left"></i>
                             Browse Products
                         </a>
@@ -76,9 +80,9 @@
                 @endif
 
                 @if($cart->items->count() > 0)
-                    <a href="{{ route('home') }}" class="inline-flex items-center gap-2 text-gray-500 hover:text-vortexGreen transition-all duration-300 text-sm uppercase font-bold tracking-widest mt-4 hover:translate-x-1">
+                    <a href="{{ route('home') }}" class="inline-flex items-center gap-2 text-gray-400 hover:text-vortexGreen transition-colors duration-300 text-sm font-medium">
                         <i class="fa-solid fa-arrow-left"></i>
-                        Continue Scouting Products
+                        Continue Shopping
                     </a>
                 @endif
             </div>
@@ -93,11 +97,11 @@
                         <div class="space-y-4 mb-8">
                             <div class="flex justify-between text-gray-400 text-sm">
                                 <span>Subtotal</span>
-                                <span class="text-white">${{ number_format($subtotal, 2) }}</span>
+                                <span class="text-white">${{ number_format($total, 2) }}</span>
                             </div>
                             <div class="flex justify-between text-gray-400 text-sm">
                                 <span>Shipping Fees</span>
-                                <span class="text-vortexGreen">{{ $shipping > 0 ? '$' . number_format($shipping, 2) : 'FREE' }}</span>
+                                <span class="text-vortexGreen">FREE</span>
                             </div>
                         </div>
 
@@ -108,13 +112,23 @@
                             </div>
                         </div>
 
-                        <button class="w-full bg-vortexGreen text-black font-display font-black py-5 uppercase tracking-[0.2em] hover:bg-white hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(57,255,20,0.4)] transition-all duration-300 shadow-[0_0_20px_rgba(57,255,20,0.2)] active:scale-95 animate-pulse-slow">
+                        <button class="w-full bg-vortexGreen hover:bg-white text-black font-display font-bold py-4 px-6 rounded-lg transition-all duration-300 hover:shadow-lg hover:scale-105">
                             <span class="flex items-center justify-center gap-2">
                                 <i class="fa-solid fa-rocket"></i>
                                 Initialize Checkout
-                                <i class="fa-solid fa-rocket"></i>
                             </span>
                         </button>
+
+                        <form action="{{ route('cart.clear') }}" method="POST" onsubmit="return confirm('Are you sure you want to clear your entire cart?')" class="mt-4">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-display font-bold py-3 px-6 rounded-lg transition-all duration-300 hover:shadow-lg">
+                                <span class="flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-trash"></i>
+                                    Clear Cart
+                                </span>
+                            </button>
+                        </form>
 
                         <div class="mt-8 flex flex-col gap-4">
                             <div class="flex items-center gap-3 text-[10px] text-gray-500 uppercase font-bold">
