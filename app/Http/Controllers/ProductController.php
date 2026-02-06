@@ -109,10 +109,8 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-
-        $this->authorize('view', $product);
-        return $product;
-
+        $seller = $product->seller;
+        return view('client.product_details', compact('product', 'seller'));
     }
 
     /**
