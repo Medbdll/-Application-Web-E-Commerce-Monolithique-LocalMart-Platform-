@@ -16,7 +16,25 @@ class CategoryFactory extends Factory
      */
     public function definition(): array
     {
-        $name = fake()->unique()->words(2, true);
+        $categories = [
+            'Gaming Desktops',
+            'Gaming Laptops',
+            'Mechanical Keyboards',
+            'Gaming Mice',
+            'Gaming Chairs',
+            'Headsets & Audio',
+            'Monitors',
+            'Graphics Cards',
+            'Processors',
+            'Gaming Consoles',
+            'Controllers',
+            'Gaming Accessories',
+            'VR Equipment',
+            'Gaming Desks',
+            'Lighting',
+        ];
+
+        $name = fake()->unique()->randomElement($categories);
 
         return [
             'name' => $name,

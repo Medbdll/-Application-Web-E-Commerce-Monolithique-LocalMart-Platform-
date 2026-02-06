@@ -7,6 +7,9 @@
                 <p class="text-gray-500 text-xs mb-6 leading-relaxed">{{$product->description}}</p>
                 <div class="flex justify-between items-center mt-auto">
                     <span class="text-xl font-bold">{{ $product->price }} MAD</span>
-                    <button class="bg-vortexGreen text-black font-bold px-4 py-1 text-sm hover:bg-white transition uppercase">Buy</button>
+                    <form action="{{ route('cart.add', $product->id) }}" method="POST" class="inline">
+                        @csrf
+                        <button type="submit" class="bg-vortexGreen text-black font-bold px-4 py-1 text-sm hover:bg-white transition uppercase">Buy</button>
+                    </form>
                 </div>
             </div>

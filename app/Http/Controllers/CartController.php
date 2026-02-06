@@ -28,8 +28,8 @@ class CartController extends Controller
         }
         
         $shipping = $subtotal > 0 ? 0 : 0;
-        $tax = $subtotal * 0.096; 
-        $total = $subtotal + $shipping + $tax;
+        $tax = 0; // Tax ignored
+        $total = $subtotal + $shipping;
 
         return view('client.cart', compact('cart', 'subtotal', 'shipping', 'tax', 'total', 'totalItems'));
     }

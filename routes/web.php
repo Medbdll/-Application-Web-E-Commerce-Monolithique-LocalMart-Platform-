@@ -1,9 +1,8 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\dashboardController;
 use App\Http\Controllers\ProductController;
