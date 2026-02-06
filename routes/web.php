@@ -3,7 +3,7 @@
 use App\Http\Controllers\CategoryController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\dashboardController;
 use App\Http\Controllers\ProductController;
@@ -11,15 +11,14 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\ProfileController;
 
 Route::get('/', function () {
-  if(Auth::check() && Auth::user()->hasRole(['admin', 'seller','moderator'])) {
-    return redirect()->route('dashboard');
-  }
-  if(Auth::check() && Auth::user()->hasRole('client')) {
-    return redirect()->route('home');
-  }
-  return redirect()->route('login');
+    return Inertia::render('Welcome', [
+        'canLogin' => Route::has('login'),
+        'canRegister' => Route::has('register'),
+        'laravelVersion' => Application::VERSION,
+        'phpVersion' => PHP_VERSION,
+    ]);
 });
-Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified', 'role:admin|seller|moderator'])->group(function () {
+Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified', 'role:admin|seller'])->group(function () {
     Route::get('/dashboard', [dashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/product', [dashboardController::class, 'product'])->name('product');
     Route::get('/dashboard/orders', [dashboardController::class, 'orders'])->name('orders');
