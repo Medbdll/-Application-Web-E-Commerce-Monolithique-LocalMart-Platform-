@@ -38,26 +38,26 @@
                 </h1>
                 <p class="text-gray-400 mt-1 text-sm">Desktops, keyboards, laptops & more</p>
             </div>
-            
+
             <div class="relative w-full md:w-[400px]">
-                <input type="text" 
-                       placeholder="SEARCH FOR A PRODUCT" 
+                <input type="text"
+                       placeholder="SEARCH FOR A PRODUCT"
                        class="w-full bg-transparent border border-gray-700 text-white px-4 py-4 pr-12 focus:outline-none focus:border-neon focus:ring-1 focus:ring-neon transition-all duration-300 placeholder-gray-500 text-sm tracking-wider font-semibold rounded-sm">
                 <i class="fa-solid fa-magnifying-glass absolute right-4 top-5 text-gray-400"></i>
             </div>
         </div>
     </section>
 
-    <x-cards />
-    <x-cards />
+    <x-cards  :products="$products"/>
+
 
     <section class="bg-black py-20 text-center relative overflow-hidden">
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[300px] bg-white/5 blur-3xl rounded-full -z-10"></div>
 
         <h2 class="text-3xl md:text-5xl font-display font-bold uppercase tracking-wider mb-20 text-white">The Perks of Vortex.ma</h2>
-        
+
         <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-12">
-            
+
             <div class="flex flex-col items-center group">
                 <div class="mb-6 relative">
                     <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -106,6 +106,6 @@
         </div>
     </section>
 
-    
+
 
     @endsection

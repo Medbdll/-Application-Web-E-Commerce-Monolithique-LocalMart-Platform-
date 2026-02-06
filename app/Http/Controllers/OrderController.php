@@ -12,13 +12,20 @@ class OrderController extends Controller
      */
     public function index()
     {
-        //
+        if ($this->isAdmin()) {
+            $orders = Order::all();
+        } else {
+            $orders = Order::where('user_id', $this->authenticatedUser()->id)->get();
+        }
+
+        return $orders;
+
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
         //
     }
@@ -28,7 +35,11 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        if ($this->authenticatedUser()->hasRole('seller')) {
+
+        } else {
+            abort(403);
+        }
     }
 
     /**
@@ -36,7 +47,8 @@ class OrderController extends Controller
      */
     public function show(Order $order)
     {
-        //
+        $this->authorize('view', $order);
+        return view('orders.show', compact('order'));
     }
 
     /**
@@ -44,7 +56,7 @@ class OrderController extends Controller
      */
     public function edit(Order $order)
     {
-        //
+        $this->authorize('edit', $order);
     }
 
     /**

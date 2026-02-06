@@ -35,7 +35,7 @@ class ProductController extends Controller
             if ($request->ajax()) {
                 return response()->json($products);
             }
-            return view('products.index', compact('products'));
+            return view('client.index', compact('products'));
         }
 
         if (auth()->user()->hasRole('seller')) {
