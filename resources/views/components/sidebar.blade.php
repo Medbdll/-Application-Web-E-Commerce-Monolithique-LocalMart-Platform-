@@ -6,7 +6,7 @@
         </div>
 
         <nav class="mt-4 px-4 space-y-2">
-            <a href="{{ route('products.index') }}" class="flex color-yellow items-center px-4 py-3 {{ request()->routeIs('products.index') ? 'sidebar-active' : '' }} transition-all">
+            <a href="{{ route('dashboard') }}" class="flex color-yellow items-center px-4 py-3 {{ request()->routeIs('dashboard') ? 'sidebar-active' : '' }} transition-all">
                 <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                 Dashboard
             </a>
@@ -23,7 +23,7 @@
                 Users
             </a>
             <div class="pt-4 pb-2 text-xs font-semibold text-gray-600 uppercase tracking-widest px-4">System</div>
-            <a href="{{ route('dashboard.profile.edit') }}" class="flex items-center px-4 py-3 {{ request()->routeIs('dashboard.profile.*') ? 'sidebar-active' : 'text-gray-400 hover:text-[#39FF14]' }} hover:bg-gray-900 rounded-lg transition-all">
+            <a href="{{ route('dashboard.profile') }}" class="flex items-center px-4 py-3 {{ request()->routeIs('dashboard.profile') ? 'sidebar-active' : 'text-gray-400 hover:text-[#39FF14]' }} hover:bg-gray-900 rounded-lg transition-all">
                 <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                 Profile
             </a>

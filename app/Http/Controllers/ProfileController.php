@@ -9,6 +9,16 @@ use Illuminate\Validation\Rule;
 class ProfileController extends Controller
 {
     /**
+     * Show the profile.
+     */
+    public function show(Request $request)
+    {
+        return view('profile.show', [
+            'user' => $request->user(),
+        ]);
+    }
+
+    /**
      * Show the profile edit form.
      */
     public function edit(Request $request)

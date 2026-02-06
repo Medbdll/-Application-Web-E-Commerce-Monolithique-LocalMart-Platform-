@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Inter:wght@400;600&display=swap"
         rel="stylesheet">
     @vite('resources/css/app.css')
+    @livewireStyles
 </head>
 
 <body class="flex min-h-screen">
@@ -16,6 +17,7 @@
     <main class="flex-1 ml-64 p-8">
         @yield('content')
     </main>
+    @livewireScripts
 </body>
 
 </html>
