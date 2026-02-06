@@ -57,7 +57,7 @@ Route::middleware(['auth', config('jetstream.auth_session'), 'verified', 'role:c
 
 Route::middleware(['auth', config('jetstream.auth_session'), 'verified', 'role:admin|seller|moderator'])->group(function () {
     Route::get('/dashboard', [dashboardController::class, 'index'])->name('dashboard');
-    Route::get('/dashboard/product', [dashboardController::class, 'product'])->name('product');
+    Route::get('/dashboard/product', [ProductController::class, 'index'])->name('product');
     Route::get('/dashboard/orders', [dashboardController::class, 'orders'])->name('orders');
     Route::get('/dashboard/users', [dashboardController::class, 'users'])->name('users');
 });
@@ -73,3 +73,4 @@ Route::middleware(['auth', config('jetstream.auth_session'), 'verified', 'role:c
 
 Route::resource('products', ProductController::class)->middleware('auth');
 Route::resource('categories', CategoryController::class)->middleware('auth');
+Route::resource('admin/products' , ProductController::class)->middleware('auth');
