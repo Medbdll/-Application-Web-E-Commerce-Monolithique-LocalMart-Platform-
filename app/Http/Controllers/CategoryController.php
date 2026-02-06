@@ -59,7 +59,9 @@ class CategoryController extends Controller
      */
     public function show(Category $category)
     {
-        //
+        if(auth()->user()->hasRole(['admin', 'moderator' , 'client' , 'seller'])){
+            return dd($category);
+        }
     }
 
     /**
