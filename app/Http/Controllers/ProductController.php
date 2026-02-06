@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Spatie\Permission\Traits\HasRoles;
 
 class ProductController extends Controller
 {
@@ -16,17 +17,46 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+
+        $term = $request->input('term');
+
         if (auth()->user()->hasRole(['client', 'moderator', 'admin'])) {
             $this->authorize('viewAny', Product::class);
-            return dump(Product::all());
+
+            $query = Product::query();
+            if ($term) {
+                $query->where('name', 'like', "%{$term}%")
+                    ->orWhere('description', 'like', "%{$term}%");
+            }
+            $products = $query->latest()->get();
+
+            if ($request->ajax()) {
+                return response()->json($products);
+            }
+            return view('client.index', compact('products'));
         }
+
         if (auth()->user()->hasRole('seller')) {
             $this->authorize('viewAny', Product::class);
-            return dump(Product::where('user_id', auth()->id())->get());
+
+            $query = Product::where('user_id', auth()->id());
+            if ($term) {
+                $query->where(function ($q) use ($term) {
+                    $q->where('name', 'like', "%{$term}%")
+                        ->orWhere('description', 'like', "%{$term}%");
+                });
+            }
+            $products = $query->latest()->get();
+
+            if ($request->ajax()) {
+                return response()->json($products);
+            }
+            return view('products.index', compact('products'));
         }
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -35,10 +65,10 @@ class ProductController extends Controller
     {
         if (auth()->user()->hasRole(['seller'])) {
             $this->authorize('create', Product::class);
-            return 'hey hey ';
+            //we should return the create form
         }
 
-        //we should return the create form
+
     }
 
     /**
@@ -46,21 +76,32 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        $this->authorize('create', Product::class);
 
-        $validated = $request->validate([
+        if (auth()->user()->hasRole(['seller'])) {
+            $this->authorize('create', Product::class);
 
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'price' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
-            'status' => 'required|in:active,inactive',
-            'category_id' => 'required|exists:categories,id'
+            $validated = $request->validate([
 
-        ]);
+                'name' => 'required|string|max:255',
+                'description' => 'required|string',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'price' => 'required|numeric|min:0',
+                'stock' => 'required|integer|min:0',
+                'status' => 'required|in:active,inactive',
+                'category_id' => 'required|exists:categories,id'
 
-        $validated['user_id'] = auth()->id();
-        Product::create($validated);
+            ]);
+
+            if ($request->hasFile('image')) {
+                $validated['image'] = $request->file('image')->store('products', 'public');
+            }
+
+            $validated['user_id'] = auth()->id();
+            $product = Product::create($validated);
+            return response()->json($product, 201);
+        } else {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
     }
 
     /**
@@ -68,17 +109,22 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
+
         $this->authorize('view', $product);
         return $product;
+
     }
 
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(Product $product)
+
     {
-        $this->authorize('update', $product);
-        //return the form
+        if (auth()->user()->hasRole('seller')) {
+            $this->authorize('update', $product);
+            //return the form
+        }
     }
 
     /**
@@ -86,19 +132,31 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        $this->authorize('update', $product);
 
-        $validated = $request->validate([
+        if (auth()->user()->hasRole('seller')) {
+            $this->authorize('update', $product);
 
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'price' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
-            'status' => 'required|in:active,inactive',
-            'category_id' => 'required|exists:categories,id'
-        ]);
+            $validated = $request->validate([
 
-        $product->update($validated);
+                'name' => 'required|string|max:255',
+                'description' => 'required|string',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'price' => 'required|numeric|min:0',
+                'stock' => 'required|integer|min:0',
+                'status' => 'required|in:active,inactive',
+                'category_id' => 'required|exists:categories,id'
+            ]);
+
+            if ($request->hasFile('image')) {
+                $validated['image'] = $request->file('image')->store('products', 'public');
+            }
+
+            $product->update($validated);
+            return response()->json($product);
+        } else {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
     }
 
 
@@ -107,7 +165,14 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        $this->authorize('delete', $product);
+        if (auth()->user()->hasRole(['admin', 'seller'])) {
+            $this->authorize('delete', $product);
+            $product->delete();
+            return response()->json(['message' => 'Product deleted successfully']);
+
+        }
+        return response()->json(['error' => 'Unauthorized'], 403);
+
     }
 
     private function middleware(string $string)

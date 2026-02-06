@@ -4,15 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+
 
 class CategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
+
     public function index()
     {
-        //
+        if (auth()->user()->hasRole(['admin', 'moderator', 'client', 'moderator'])) {
+
+
+            response()->json(Category::get()->pluck('name'));
+        } else {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
     }
 
     /**
@@ -20,7 +27,13 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        //
+        if (auth()->user()->hasRole(['admin'])){
+            return view(('category.create'));
+        }
+        else{
+            return  response()->json(['error' => 'unauthorized'] , 403);
+        }
+
     }
 
     /**
@@ -28,7 +41,17 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        if (auth()->user()->hasRole('admin')){
+            $validated = $request->validate([
+                'name' => 'required|string|max:255|unique:categories,name',
+
+            ]);
+            $validated['slug'] = Str::slug($validated['name']);
+            $category = Category::create($validated);
+            return response()->json($category, 201);
+        }else{
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
     }
 
     /**
@@ -36,7 +59,9 @@ class CategoryController extends Controller
      */
     public function show(Category $category)
     {
-        //
+        if(auth()->user()->hasRole(['admin', 'moderator' , 'client' , 'seller'])){
+            return dd($category);
+        }
     }
 
     /**
@@ -62,4 +87,6 @@ class CategoryController extends Controller
     {
         //
     }
+
+
 }
