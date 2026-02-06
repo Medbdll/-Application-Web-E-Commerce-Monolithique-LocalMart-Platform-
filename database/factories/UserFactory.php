@@ -39,6 +39,15 @@ class UserFactory extends Factory
         ];
     }
 
+    public function configure()
+{
+    return $this->afterCreating(function (\App\Models\User $user) {
+        \App\Models\Cart::create([
+            'user_id' => $user->id,
+        ]);
+    });
+}
+
     /**
      * Indicate that the model's email address should be unverified.
      */
