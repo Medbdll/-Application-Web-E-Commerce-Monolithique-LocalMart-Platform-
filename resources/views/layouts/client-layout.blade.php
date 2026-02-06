@@ -17,5 +17,12 @@
         @yield('content')
     </main>
     <x-footer />
+
+    <script>
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+    </script>
 </body>
 </html>

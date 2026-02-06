@@ -42,3 +42,202 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: #39FF14;
 }
+
+/* Modern glassmorphism effects */
+.glass-effect {
+    background: rgba(10, 10, 10, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Enhanced animations */
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slide-up {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slide-down {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse-slow {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.8;
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes glow-pulse {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(57, 255, 20, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 40px rgba(57, 255, 20, 0.6);
+    }
+}
+
+.animate-fade-in {
+    animation: fade-in 0.6s ease-out;
+}
+
+.animate-slide-up {
+    animation: slide-up 0.6s ease-out;
+}
+
+.animate-slide-down {
+    animation: slide-down 0.6s ease-out;
+}
+
+.animate-pulse-slow {
+    animation: pulse-slow 3s ease-in-out infinite;
+}
+
+.animate-shimmer {
+    background: linear-gradient(90deg, transparent, rgba(57, 255, 20, 0.3), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+}
+
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+.animate-glow-pulse {
+    animation: glow-pulse 2s ease-in-out infinite;
+}
+
+.animation-delay-200 {
+    animation-delay: 200ms;
+}
+
+/* Modern button effects */
+.btn-modern {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.btn-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn-modern:hover::before {
+    left: 100%;
+}
+
+/* Enhanced card effects */
+.card-modern {
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.card-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* Quantity input styling */
+.quantity-input {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.quantity-input:focus {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: #39FF14;
+    box-shadow: 0 0 20px rgba(57, 255, 20, 0.2);
+}
+
+/* Loading states */
+.loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid transparent;
+    border-top: 2px solid #39FF14;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Success/error states */
+.success-flash {
+    animation: success-flash 0.5s ease;
+}
+
+@keyframes success-flash {
+    0%, 100% { background-color: transparent; }
+    50% { background-color: rgba(57, 255, 20, 0.1); }
+}
+
+.error-flash {
+    animation: error-flash 0.5s ease;
+}
+
+@keyframes error-flash {
+    0%, 100% { background-color: transparent; }
+    50% { background-color: rgba(239, 68, 68, 0.1); }
+}

@@ -42,9 +42,16 @@ class UserFactory extends Factory
     public function configure()
 {
     return $this->afterCreating(function (\App\Models\User $user) {
+        // Create cart for the user
         \App\Models\Cart::create([
             'user_id' => $user->id,
         ]);
+
+        // Assign a random role if not specified
+        if (!$user->hasAnyRole()) {
+            $roles = ['client', 'seller', 'admin', 'moderator'];
+            $user->assignRole(fake()->randomElement($roles));
+        }
     });
 }
 
@@ -77,5 +84,45 @@ class UserFactory extends Factory
                 ->when(is_callable($callback), $callback),
             'ownedTeams'
         );
+    }
+
+    /**
+     * Create a client user.
+     */
+    public function client(): static
+    {
+        return $this->afterCreating(function (\App\Models\User $user) {
+            $user->assignRole('client');
+        });
+    }
+
+    /**
+     * Create a seller user.
+     */
+    public function seller(): static
+    {
+        return $this->afterCreating(function (\App\Models\User $user) {
+            $user->assignRole('seller');
+        });
+    }
+
+    /**
+     * Create an admin user.
+     */
+    public function admin(): static
+    {
+        return $this->afterCreating(function (\App\Models\User $user) {
+            $user->assignRole('admin');
+        });
+    }
+
+    /**
+     * Create a moderator user.
+     */
+    public function moderator(): static
+    {
+        return $this->afterCreating(function (\App\Models\User $user) {
+            $user->assignRole('moderator');
+        });
     }
 }
