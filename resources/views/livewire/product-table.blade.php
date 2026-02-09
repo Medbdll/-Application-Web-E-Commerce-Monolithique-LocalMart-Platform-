@@ -197,5 +197,10 @@
             @endforelse
             </tbody>
         </table>
+
     </div>
+    </table>
+
+    {{ $products->links('livewire.pagination_product') }}
+
 </div>
