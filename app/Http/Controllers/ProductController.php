@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cart;
+use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Http\Request;
@@ -73,10 +75,13 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-
-        $this->authorize('view', $product);
-        return $product;
-
+        $user = auth()->user();
+        $cart = $user->cart;
+        $cardItem = CartItem::where(['product_id' => $product->id, 'cart_id' => $cart->id])->first();
+        $seller = $product->seller;
+        $product->stock -= $cardItem->quantity ?? 0;
+        $reviews = $product->reviews()->with('user')->latest()->take(3)->get();
+        return view('client.product_details', compact('product', 'seller','reviews'));
     }
 
     /**

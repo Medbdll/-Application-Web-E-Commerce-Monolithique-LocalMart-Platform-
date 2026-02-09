@@ -43,4 +43,9 @@ class Product extends Model
             ->withTimestamps();
     }
 
+    public function seller()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
 }
