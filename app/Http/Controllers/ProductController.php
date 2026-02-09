@@ -9,7 +9,6 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class ProductController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware('auth');
@@ -20,59 +19,8 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $term = $request->input('term');
-
-        if (auth()->user()->hasRole(['client', 'moderator', 'admin'])) {
-            $query = Product::with(['user', 'category']);
-            if ($term) {
-                $query->where('name', 'like', "%{$term}%")
-                    ->orWhere('description', 'like', "%{$term}%");
-            }
-            $products = $query->latest()->get()->map(function($product) {
-                return (object)[
-                    'name' => $product->name,
-                    'sku' => 'SKU-' . $product->id,
-                    'image' => $product->image,
-                    'category' => $product->category->name ?? 'Uncategorized',
-                    'condition' => $product->status === 'active' ? 'New' : 'Pre-Owned',
-                    'seller_name' => $product->user->name ?? 'Unknown',
-                    'seller_avatar' => null,
-                    'seller_verified' => $product->user->hasRole('admin'),
-                    'seller_type' => $product->user->hasRole('admin') ? 'Verified Partner' : 'Community Seller',
-                    'seller_rating' => 5,
-                    'seller_sales' => rand(10, 5000),
-                    'price' => $product->price,
-                    'price_type' => 'Retail Price',
-                    'stock' => $product->stock,
-                    'status' => $product->status,
-                    'listed_at' => $product->created_at->diffForHumans(),
-                ];
-            });
-
-            if ($request->ajax()) {
-                return response()->json($products);
-            }
-
-            return view('dashboard.product', compact('products'));
-        }
-
-        if (auth()->user()->hasRole('seller')) {
-            $query = Product::where('user_id', auth()->id())->with(['user', 'category']);
-            if ($term) {
-                $query->where(function ($q) use ($term) {
-                    $q->where('name', 'like', "%{$term}%")
-                        ->orWhere('description', 'like', "%{$term}%");
-                });
-            }
-            $products = $query->latest()->get();
-
-            if ($request->ajax()) {
-                return response()->json($products);
-            }
-            return view('products.index', compact('products'));
-        }
+        return view('dashboard.product');
     }
-
 
     /**
      * Show the form for creating a new resource.
@@ -190,5 +138,8 @@ class ProductController extends Controller
         return response()->json(['error' => 'Unauthorized'], 403);
 
     }
+
+
+
 
 }
