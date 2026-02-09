@@ -5,12 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Spatie\Permission\Traits\HasRoles;
 
 class ProductController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware('auth');
@@ -21,44 +21,8 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-
-        $term = $request->input('term');
-
-        if (auth()->user()->hasRole(['client', 'moderator', 'admin'])) {
-            $this->authorize('viewAny', Product::class);
-
-            $query = Product::query();
-            if ($term) {
-                $query->where('name', 'like', "%{$term}%")
-                    ->orWhere('description', 'like', "%{$term}%");
-            }
-            $products = $query->latest()->get();
-
-            if ($request->ajax()) {
-                return response()->json($products);
-            }
-            return view('client.index', compact('products'));
-        }
-
-        if (auth()->user()->hasRole('seller')) {
-            $this->authorize('viewAny', Product::class);
-
-            $query = Product::where('user_id', auth()->id());
-            if ($term) {
-                $query->where(function ($q) use ($term) {
-                    $q->where('name', 'like', "%{$term}%")
-                        ->orWhere('description', 'like', "%{$term}%");
-                });
-            }
-            $products = $query->latest()->get();
-
-            if ($request->ajax()) {
-                return response()->json($products);
-            }
-            return view('products.index', compact('products'));
-        }
+        return view('dashboard.product');
     }
-
 
     /**
      * Show the form for creating a new resource.
@@ -180,8 +144,7 @@ class ProductController extends Controller
 
     }
 
-    private function middleware(string $string)
-    {
-    }
+
+
 
 }

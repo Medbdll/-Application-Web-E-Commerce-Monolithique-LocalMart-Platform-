@@ -6,87 +6,78 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
-
 class CategoryController extends Controller
 {
 
-
-    public function index()
+    public static function index()
     {
-        if (auth()->user()->hasRole(['admin', 'moderator', 'client', 'moderator'])) {
 
+            $categories = Category::latest()->get();
+            return $categories;
 
-            response()->json(Category::get()->pluck('name'));
-        } else {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        if (auth()->user()->hasRole(['admin'])){
-            return view(('category.create'));
+        if (auth()->user()->hasRole(['admin'])) {
+            return view('categories.create');
         }
-        else{
-            return  response()->json(['error' => 'unauthorized'] , 403);
-        }
-
+        return response()->json(['error' => 'Unauthorized'], 403);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        if (auth()->user()->hasRole('admin')){
+        if (auth()->user()->hasRole(['admin'])) {
             $validated = $request->validate([
-                'name' => 'required|string|max:255|unique:categories,name',
-
+                'name' => 'required|string|max:255|unique:categories,name'
             ]);
+
             $validated['slug'] = Str::slug($validated['name']);
             $category = Category::create($validated);
+
             return response()->json($category, 201);
-        }else{
-            return response()->json(['error' => 'Unauthorized'], 403);
         }
+        return response()->json(['error' => 'Unauthorized'], 403);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Category $category)
     {
-        if(auth()->user()->hasRole(['admin', 'moderator' , 'client' , 'seller'])){
-            return dd($category);
-        }
+        return response()->json($category->load('products'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Category $category)
     {
-        //
+        if (auth()->user()->hasRole(['admin', 'moderator'])) {
+            return view('categories.edit', compact('category'));
+        }
+        return response()->json(['error' => 'Unauthorized'], 403);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Category $category)
     {
-        //
+        if (auth()->user()->hasRole(['admin', 'moderator'])) {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255|unique:categories,name,' . $category->id
+            ]);
+
+            $validated['slug'] = Str::slug($validated['name']);
+            $category->update($validated);
+
+            return response()->json($category);
+        }
+        return response()->json(['error' => 'Unauthorized'], 403);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Category $category)
     {
-        //
+        if (auth()->user()->hasRole(['admin'])) {
+            if ($category->products()->count() > 0) {
+                return response()->json(['error' => 'Cannot delete category with products'], 400);
+            }
+
+            $category->delete();
+            return response()->json(['message' => 'Category deleted successfully']);
+        }
+        return response()->json(['error' => 'Unauthorized'], 403);
     }
-
-
 }
