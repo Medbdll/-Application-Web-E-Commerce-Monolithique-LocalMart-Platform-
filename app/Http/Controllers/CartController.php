@@ -44,13 +44,13 @@ class CartController extends Controller
                            ->first();
 
         if ($cartItem) {
-            $cartItem->quantity += 1;
+            $cartItem->quantity += $request->quantity;
             $cartItem->save();
         } else {
             CartItem::create([
                 'cart_id' => $cart->id,
                 'product_id' => $product->id,
-                'quantity' => 1,
+                'quantity' => $request->quantity,
                 'price' => $product->price,
             ]);
         }

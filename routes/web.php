@@ -74,5 +74,6 @@ Route::middleware(['auth', config('jetstream.auth_session'), 'verified', 'role:c
 
 Route::resource('products', ProductController::class)->middleware('auth');
 Route::resource('categories', CategoryController::class)->middleware('auth');
+
 Route::resource('admin/products' , ProductController::class)->middleware('auth');
 // Route::resource('users', UserController::class)->middleware('auth');
