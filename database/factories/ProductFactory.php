@@ -50,7 +50,7 @@ class ProductFactory extends Factory
             'price' => $product['base_price'] + fake()->randomFloat(2, -50, 200),
             'stock' => fake()->numberBetween(5, 100),
             'status' => fake()->randomElement(['active', 'active', 'active', 'inactive']),
-            'user_id' => \App\Models\User::factory(),
+            'user_id' => \App\Models\User::role('seller')->inRandomOrder()->first()->id ?? \App\Models\User::factory(),
             'category_id' => $category ? $category->id : \App\Models\Category::factory(),
         ];
     }
