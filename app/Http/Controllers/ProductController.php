@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Http\Request;
-use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class ProductController extends Controller
 {
@@ -189,14 +189,6 @@ class ProductController extends Controller
         }
         return response()->json(['error' => 'Unauthorized'], 403);
 
-    }
-
-    private function middleware(string $string)
-    {
-    }
-
-    private function authorize(string $string, string $class)
-    {
     }
 
 }

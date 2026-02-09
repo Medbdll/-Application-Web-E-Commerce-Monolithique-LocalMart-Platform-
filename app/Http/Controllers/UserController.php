@@ -3,23 +3,26 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\User;
 
-class dashboardController extends Controller
+class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return view("dashboard.index");
-    }
-    public function product()
-    {
-        return view("dashboard.product");
-    }
-    public function orders()
-    {
-        return view("dashboard.orders");
+        $users = User::with('roles')->get();
+        $total_users=$users->count();
+        $sellers = $users->filter(function($user) {
+            return $user->hasRole('seller');
+        })->count();
+        //  && $user->status === 'active'
+        if ($request->ajax()) {
+                return response()->json($users);
+            }
+
+        return view('dashboard.users', compact(['users','total_users','sellers']));
     }
 
     /**
@@ -27,7 +30,7 @@ class dashboardController extends Controller
      */
     public function create()
     {
-        
+        //
     }
 
     /**
