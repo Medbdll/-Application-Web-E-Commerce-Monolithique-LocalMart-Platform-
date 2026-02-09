@@ -11,6 +11,8 @@ class ProductTable extends Component
     public $search = '';
     public $category = '';
 
+    protected $listeners = ['productSaved' => '$refresh'];
+
     public function delete($id)
     {
         Product::find($id)->delete();
@@ -20,6 +22,15 @@ class ProductTable extends Component
     {
         $product = Product::find($id);
         $product->update(['status' => $product->status === 'active' ? 'inactive' : 'active']);
+    }
+
+    public function toggleVerified($sellerId)
+    {
+        if (auth()->user()->hasRole('admin')) {
+            $user = \App\Models\User::find($sellerId);
+            $newStatus = $user->verified === 'verified' ? 'not verified' : 'verified';
+            $user->update(['verified' => $newStatus]);
+        }
     }
 
     public function render()
@@ -46,10 +57,11 @@ class ProductTable extends Component
                 'image' => $product->image,
                 'category' => $product->category->name ?? 'Uncategorized',
                 'condition' => $product->status === 'active' ? 'New' : 'Pre-Owned',
+                'seller_id' => $product->user_id,
                 'seller_name' => $product->user->name ?? 'Unknown',
                 'seller_avatar' => null,
-                'seller_verified' => $product->user->hasRole('admin'),
-                'seller_type' => $product->user->hasRole('admin') ? 'Verified Partner' : 'Community Seller',
+                'seller_verified' => $product->user->verified === 'verified',
+                'seller_type' => $product->user->verified === 'verified' ? 'Verified Partner' : 'Community Seller',
                 'seller_rating' => 5,
                 'seller_sales' => rand(10, 5000),
                 'price' => $product->price,
