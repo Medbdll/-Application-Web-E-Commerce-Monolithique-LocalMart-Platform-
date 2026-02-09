@@ -5,9 +5,13 @@ namespace App\Livewire;
 use Livewire\Component;
 use App\Models\Product;
 use App\Models\Category;
+use Livewire\WithPagination;
 
 class ProductTable extends Component
 {
+    use WithPagination;
+
+    protected $paginationTheme = 'tailwind';
     public $search = '';
     public $category = '';
 
@@ -49,7 +53,7 @@ class ProductTable extends Component
             $query->where('user_id', auth()->id());
         }
 
-        $products = $query->latest()->get()->map(function($product) {
+        $products = $query->latest()->paginate(10)->through(function ($product) {
             return (object)[
                 'id' => $product->id,
                 'name' => $product->name,
