@@ -19,21 +19,17 @@ class CartController extends Controller
             $cart = Cart::create(['user_id' => $user->id]);
         }
 
-        $subtotal = 0;
+        $total = 0;
         $totalItems = 0;
         
         foreach ($cart->items as $item) {
-            $subtotal += $item->price * $item->quantity;
+            $total += $item->price * $item->quantity;
             $totalItems += $item->quantity;
         }
         
-        $shipping = $subtotal > 0 ? 0 : 0;
-        $tax = $subtotal * 0.096; 
-        $total = $subtotal + $shipping + $tax;
 
-        return view('client.cart', compact('cart', 'subtotal', 'shipping', 'tax', 'total', 'totalItems'));
+        return view('client.cart', compact('cart', 'total',   'totalItems'));
     }
-
     public function add(Request $request, Product $product)
     {
         $user = Auth::user();
@@ -48,13 +44,13 @@ class CartController extends Controller
                            ->first();
 
         if ($cartItem) {
-            $cartItem->quantity += 1;
+            $cartItem->quantity += $request->quantity;
             $cartItem->save();
         } else {
             CartItem::create([
                 'cart_id' => $cart->id,
                 'product_id' => $product->id,
-                'quantity' => 1,
+                'quantity' => $request->quantity,
                 'price' => $product->price,
             ]);
         }
@@ -88,7 +84,8 @@ class CartController extends Controller
         if ($cart) {
             $cart->items()->delete();
         }
-
+        
         return redirect()->route('cart.index')->with('success', 'Cart cleared successfully!');
     }
+
 }

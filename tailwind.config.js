@@ -16,6 +16,11 @@ export default {
         extend: {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                display: ['Orbitron', ...defaultTheme.fontFamily.sans],
+            },
+            colors: {
+                vortexGreen: '#39FF14',
+                cardBg: '#0a0a0a',
             },
         },
     },

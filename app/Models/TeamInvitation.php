@@ -25,4 +25,9 @@ class TeamInvitation extends JetstreamTeamInvitation
     {
         return $this->belongsTo(Jetstream::teamModel());
     }
+
+    public function cart(): BelongsTo
+    {
+        return $this->belongsTo(Cart::class);
+    }
 }

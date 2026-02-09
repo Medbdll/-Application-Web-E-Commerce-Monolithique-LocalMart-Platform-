@@ -1,9 +1,8 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\dashboardController;
 use App\Http\Controllers\ProductController;
@@ -75,4 +74,3 @@ Route::middleware(['auth', config('jetstream.auth_session'), 'verified', 'role:c
 Route::resource('products', ProductController::class)->middleware('auth');
 Route::resource('categories', CategoryController::class)->middleware('auth');
 
-Route::resource('product/details/{product}', ProductController::class)->middleware('auth');

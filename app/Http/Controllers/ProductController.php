@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cart;
+use App\Models\CartItem;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Spatie\Permission\Traits\HasRoles;
@@ -109,8 +111,13 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
+        $user = auth()->user();
+        $cart = $user->cart;
+        $cardItem = CartItem::where(['product_id' => $product->id, 'cart_id' => $cart->id])->first();
         $seller = $product->seller;
-        return view('client.product_details', compact('product', 'seller'));
+        $product->stock -= $cardItem->quantity ?? 0;
+        $reviews = $product->reviews()->with('user')->latest()->take(3)->get();
+        return view('client.product_details', compact('product', 'seller','reviews'));
     }
 
     /**
@@ -174,10 +181,6 @@ class ProductController extends Controller
     }
 
     private function middleware(string $string)
-    {
-    }
-
-    private function authorize(string $string, string $class)
     {
     }
 

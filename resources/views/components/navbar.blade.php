@@ -4,17 +4,31 @@
                 <img src="{{ asset('assets/images/logoV.svg') }}" alt="Vortox Logo" class="h-10 w-auto group-hover:drop-shadow-[0_0_10px_rgba(57,255,20,0.5)] transition">
             </a>
 
-            <div class="hidden md:flex gap-12 font-display uppercase tracking-wider text-sm">
-                <a href="{{ route('home') }}" class="text-vortexGreen border-b-2 border-vortexGreen pb-1">Store</a>
+            <!-- Desktop Navigation -->
+            <div class="hidden md:flex gap-8 lg:gap-12 font-display uppercase tracking-wider text-sm">
+                <a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'text-vortexGreen border-b-2 border-vortexGreen pb-1' : 'text-gray-400 hover:text-vortexGreen' }} transition duration-300">Store</a>
                 @auth
-                    <a href="#" class="text-gray-400 hover:text-vortexGreen transition duration-300">Orders</a>
-                    <a href="{{ route('profile.edit') }}" class="text-gray-400 hover:text-vortexGreen transition duration-300">Profile</a>
+                    @if(auth()->user()->hasRole(['admin', 'seller', 'moderator']))
+                        <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard*') ? 'text-vortexGreen border-b-2 border-vortexGreen pb-1' : 'text-gray-400 hover:text-vortexGreen' }} transition duration-300">Dashboard</a>
+                        <a href="{{ route('orders') }}" class="{{ request()->routeIs('orders') ? 'text-vortexGreen border-b-2 border-vortexGreen pb-1' : 'text-gray-400 hover:text-vortexGreen' }} transition duration-300">Orders</a>
+                    @endif
+                    @if(auth()->user()->hasRole('client'))
+                        <a href="#" class="text-gray-400 hover:text-vortexGreen transition duration-300">Orders</a>
+                    @endif
+                    <a href="{{ route('profile.edit') }}" class="{{ request()->routeIs('profile*') ? 'text-vortexGreen border-b-2 border-vortexGreen pb-1' : 'text-gray-400 hover:text-vortexGreen' }} transition duration-300">Profile</a>
                 @endauth
             </div>
 
-            <div class="flex items-center gap-6">
+            <div class="flex items-center gap-4 lg:gap-6">
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden text-gray-400 hover:text-vortexGreen transition" onclick="toggleMobileMenu()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+
                 @auth
-                    <button class="text-gray-400 hover:text-vortexGreen transition">
+                    <button class="hidden sm:block text-gray-400 hover:text-vortexGreen transition">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                         </svg>
@@ -60,6 +74,23 @@
                     <a href="{{ route('login') }}" class="text-gray-400 hover:text-vortexGreen transition">
                         Login
                     </a>
+                @endauth
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-black/95 backdrop-blur-md border-t border-green-900/50">
+            <div class="container mx-auto px-6 py-4 space-y-3">
+                <a href="{{ route('home') }}" class="block py-2 font-display uppercase tracking-wider text-sm {{ request()->routeIs('home') ? 'text-vortexGreen' : 'text-gray-400' }}">Store</a>
+                @auth
+                    @if(auth()->user()->hasRole(['admin', 'seller', 'moderator']))
+                        <a href="{{ route('dashboard') }}" class="block py-2 font-display uppercase tracking-wider text-sm {{ request()->routeIs('dashboard*') ? 'text-vortexGreen' : 'text-gray-400' }}">Dashboard</a>
+                        <a href="{{ route('orders') }}" class="block py-2 font-display uppercase tracking-wider text-sm {{ request()->routeIs('orders') ? 'text-vortexGreen' : 'text-gray-400' }}">Orders</a>
+                    @endif
+                    @if(auth()->user()->hasRole('client'))
+                        <a href="#" class="block py-2 font-display uppercase tracking-wider text-sm text-gray-400">Orders</a>
+                    @endif
+                    <a href="{{ route('profile.edit') }}" class="block py-2 font-display uppercase tracking-wider text-sm {{ request()->routeIs('profile*') ? 'text-vortexGreen' : 'text-gray-400' }}">Profile</a>
                 @endauth
             </div>
         </div>
