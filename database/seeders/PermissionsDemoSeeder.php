@@ -60,23 +60,27 @@ class PermissionsDemoSeeder extends Seeder
             'name' => 'client',
             'email' => 'client@example.com',
         ]);
+        $user->syncRoles([]);
         $user->assignRole($role1);
 
         $user = \App\Models\User::factory()->create([
             'name' => 'moderator',
             'email' => 'moderator@example.com',
         ]);
+        $user->syncRoles([]);
         $user->assignRole($role2);
 
         $user = \App\Models\User::factory()->create([
             'name' => 'seller',
             'email' => 'seller@example.com',
         ]);
+        $user->syncRoles([]);
         $user->assignRole($role3);
         $user = \App\Models\User::factory()->create([
             'name' => 'admin',
             'email' => 'admin@example.com',
         ]);
+        $user->syncRoles([]);
         $user->assignRole($role4);
     }
 }

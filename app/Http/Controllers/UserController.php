@@ -40,11 +40,11 @@ class UserController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function userStatus(Request $request, $id)
+    public function userStatus(Request $request)
     {
-        $user = User::find($id);
-        
+        $user = User::find($request->user_id);
         $user->update(['status' => $user->status === 'active' ? 'banned' : 'active']);
+        // dd($user);
         return redirect()->route('users')->with('success', 'User status updated successfully');
     }
 
