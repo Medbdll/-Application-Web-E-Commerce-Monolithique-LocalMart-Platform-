@@ -61,6 +61,8 @@ Route::middleware(['auth', config('jetstream.auth_session'), 'verified', 'role:a
     Route::get('/dashboard/product', [ProductController::class, 'index'])->name('product');
     Route::get('/dashboard/orders', [dashboardController::class, 'orders'])->name('orders');
     Route::get('/dashboard/users', [UserController::class, 'index'])->name('users');
+    Route::get('/dashboard/users/update/{id}', [UserController::class, 'update'])->name('users.update');
+    Route::post('/dashboard/users/userStatus/{user}', [UserController::class, 'userStatus'])->name('users.userStatus');
 });
 
 Route::middleware(['auth', config('jetstream.auth_session'), 'verified', 'role:client', 'route.restrictions'])->group(function () {

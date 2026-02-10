@@ -38,7 +38,7 @@
             </div>
             <div>
                 <p class="text-gray-500 text-xs font-bold uppercase">Banned Accounts</p>
-                <p class="text-2xl font-gaming font-bold text-white">23</p>
+                <p class="text-2xl font-gaming font-bold text-white">{{ $banned }}</p>
             </div>
         </div>
     </div>
@@ -64,16 +64,14 @@
 
     <div class="bg-black border border-gray-900 rounded-2xl overflow-hidden shadow-2xl">
 
-      <x-users-table :users="$users"/>
+      <x-users-table :users="$usersWithoutAdmin" :allRoles="$allRoles" />
 
         <div class="p-4 border-t border-gray-900 flex justify-between items-center text-xs text-gray-500">
-            <span>Showing 1-4 of 12,842 users</span>
+            <span>Showing {{ $usersWithoutAdmin->firstItem() }}-{{ $usersWithoutAdmin->lastItem() }} users</span>
             <div class="flex gap-1">
-                <button class="px-3 py-1 bg-gray-900 rounded hover:text-white">Prev</button>
-                <button class="px-3 py-1 bg-[#39FF14] text-black font-bold rounded">1</button>
-                <button class="px-3 py-1 bg-gray-900 rounded hover:text-white">2</button>
-                <button class="px-3 py-1 bg-gray-900 rounded hover:text-white">...</button>
-                <button class="px-3 py-1 bg-gray-900 rounded hover:text-white">Next</button>
+                @if($usersWithoutAdmin->hasPages())
+                    {{ $usersWithoutAdmin->links() }}
+                @endif
             </div>
         </div>
     </div>

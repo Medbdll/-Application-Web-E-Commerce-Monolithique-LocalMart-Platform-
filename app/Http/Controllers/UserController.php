@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Spatie\Permission\Models\Role;
+
 
 class UserController extends Controller
 {
@@ -12,25 +14,38 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $users = User::with('roles')->get();
-        $total_users=$users->count();
-        $sellers = $users->filter(function($user) {
-            return $user->hasRole('seller');
+        $usersWithoutAdmin = User::with('roles')
+            ->whereDoesntHave('roles', function($query) {
+                $query->where('name', 'admin');
+            })
+            ->simplePaginate(5);
+
+        $allUsers = User::with('roles')->get();
+        $allRoles = Role::all();
+        $total_users=$allUsers->count();    
+        $sellers = $allUsers->filter(function($user) {
+            return $user->hasRole('seller') && $user->status === 'active';
         })->count();
-        //  && $user->status === 'active'
+        $banned = $allUsers->filter(function($user) {
+            return $user->status === 'banned';
+        })->count();
+
         if ($request->ajax()) {
-                return response()->json($users);
+                return response()->json($usersWithoutAdmin);
             }
 
-        return view('dashboard.users', compact(['users','total_users','sellers']));
+        return view('dashboard.users', compact(['usersWithoutAdmin','total_users','sellers','banned','allRoles']));
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function userStatus(Request $request, $id)
     {
-        //
+        $user = User::find($id);
+        
+        $user->update(['status' => $user->status === 'active' ? 'banned' : 'active']);
+        return redirect()->route('users')->with('success', 'User status updated successfully');
     }
 
     /**
@@ -62,7 +77,13 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $user = User::findOrFail($id);
+        $role = $request->input('role');
+        
+        $user->syncRoles($role);
+        
+        $page = $request->input('page', 1);
+        return redirect()->route('users', ['page' => $page])->with('success', 'User roles updated successfully');
     }
 
     /**
