@@ -96,4 +96,9 @@ protected static function boot()
     {
         return $this->hasOne(Cart::class);
     }
+
+    public function address()
+    {
+        return $this->hasOne(Address::class);
+    }
 }

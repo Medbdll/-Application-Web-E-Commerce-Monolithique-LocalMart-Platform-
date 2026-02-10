@@ -1,0 +1,96 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\User;
+use Spatie\Permission\Models\Role;
+
+
+class UserController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(Request $request)
+    {
+        $usersWithoutAdmin = User::with('roles')
+            ->whereDoesntHave('roles', function($query) {
+                $query->where('name', 'admin');
+            })
+            ->simplePaginate(5);
+
+        $allUsers = User::with('roles')->get();
+        $allRoles = Role::all();
+        $total_users=$allUsers->count();    
+        $sellers = $allUsers->filter(function($user) {
+            return $user->hasRole('seller') && $user->status === 'active';
+        })->count();
+        $banned = $allUsers->filter(function($user) {
+            return $user->status === 'banned';
+        })->count();
+
+        if ($request->ajax()) {
+                return response()->json($usersWithoutAdmin);
+            }
+
+        return view('dashboard.users', compact(['usersWithoutAdmin','total_users','sellers','banned','allRoles']));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function userStatus(Request $request, $id)
+    {
+        $user = User::find($id);
+        
+        $user->update(['status' => $user->status === 'active' ? 'banned' : 'active']);
+        return redirect()->route('users')->with('success', 'User status updated successfully');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        //
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        $user = User::findOrFail($id);
+        $role = $request->input('role');
+        
+        $user->syncRoles($role);
+        
+        $page = $request->input('page', 1);
+        return redirect()->route('users', ['page' => $page])->with('success', 'User roles updated successfully');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        //
+    }
+}
