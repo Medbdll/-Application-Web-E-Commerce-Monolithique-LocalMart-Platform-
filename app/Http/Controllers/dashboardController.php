@@ -21,10 +21,7 @@ class dashboardController extends Controller
     {
         return view("dashboard.orders");
     }
-public function users()
-    {
-        return view("dashboard.users");
-    }
+
     /**
      * Show the form for creating a new resource.
      */

@@ -7,7 +7,7 @@ use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Http\Request;
-use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class ProductController extends Controller
 {
