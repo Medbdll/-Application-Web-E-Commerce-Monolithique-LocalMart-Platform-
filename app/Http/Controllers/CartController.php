@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,34 +14,38 @@ class CartController extends Controller
     {
         $user = Auth::user();
         $cart = Cart::where('user_id', $user->id)->with('items.product')->first();
-        
-        if (!$cart) {
-            $cart = Cart::create(['user_id' => $user->id]);
+
+        if (! $cart) {
+            $cart = Cart::create(['user_id' => $user->id, 'total' => 0]);
         }
 
+        // Calculate and update total
         $total = 0;
         $totalItems = 0;
-        
+
         foreach ($cart->items as $item) {
             $total += $item->price * $item->quantity;
             $totalItems += $item->quantity;
         }
-        
 
-        return view('client.cart', compact('cart', 'total',   'totalItems'));
+        $cart->total = $total;
+        $cart->save();
+
+        return view('client.cart', compact('cart', 'total', 'totalItems'));
     }
+
     public function add(Request $request, Product $product)
     {
         $user = Auth::user();
-        
+
         $cart = Cart::where('user_id', $user->id)->first();
-        if (!$cart) {
+        if (! $cart) {
             $cart = Cart::create(['user_id' => $user->id]);
         }
 
         $cartItem = CartItem::where('cart_id', $cart->id)
-                           ->where('product_id', $product->id)
-                           ->first();
+            ->where('product_id', $product->id)
+            ->first();
 
         if ($cartItem) {
             $cartItem->quantity += $request->quantity;
@@ -61,7 +65,7 @@ class CartController extends Controller
     public function update(Request $request, CartItem $cartItem)
     {
         $request->validate([
-            'quantity' => 'required|integer|min:1'
+            'quantity' => 'required|integer|min:1',
         ]);
 
         $cartItem->quantity = $request->quantity;
@@ -73,6 +77,7 @@ class CartController extends Controller
     public function remove(CartItem $cartItem)
     {
         $cartItem->delete();
+
         return redirect()->route('cart.index')->with('success', 'Item removed from cart!');
     }
 
@@ -80,12 +85,11 @@ class CartController extends Controller
     {
         $user = Auth::user();
         $cart = Cart::where('user_id', $user->id)->first();
-        
+
         if ($cart) {
             $cart->items()->delete();
         }
-        
+
         return redirect()->route('cart.index')->with('success', 'Cart cleared successfully!');
     }
-
 }
