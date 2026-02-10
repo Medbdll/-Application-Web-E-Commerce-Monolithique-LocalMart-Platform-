@@ -9,6 +9,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserController;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Fortify\Http\Controllers\RegisteredUserController;
 use Laravel\Fortify\Http\Controllers\PasswordResetLinkController;
@@ -58,9 +59,11 @@ Route::middleware(['auth', config('jetstream.auth_session'), 'verified', 'role:c
 
 Route::middleware(['auth', config('jetstream.auth_session'), 'verified', 'role:admin|seller|moderator'])->group(function () {
     Route::get('/dashboard', [dashboardController::class, 'index'])->name('dashboard');
-    Route::get('/dashboard/product', [dashboardController::class, 'product'])->name('product');
+    Route::get('/dashboard/product', [ProductController::class, 'index'])->name('product');
     Route::get('/dashboard/orders', [dashboardController::class, 'orders'])->name('orders');
-    Route::get('/dashboard/users', [dashboardController::class, 'users'])->name('users');
+    Route::get('/dashboard/users', [UserController::class, 'index'])->name('users');
+    Route::get('/dashboard/users/update/{id}', [UserController::class, 'update'])->name('users.update');
+    Route::post('/dashboard/users/userStatus/{user}', [UserController::class, 'userStatus'])->name('users.userStatus');
 });
 
 Route::middleware(['auth', config('jetstream.auth_session'), 'verified', 'role:client', 'route.restrictions'])->group(function () {
@@ -78,3 +81,5 @@ Route::resource('categories', CategoryController::class)->middleware('auth');
 Route::resource('order', OrderController::class)->middleware('auth');
 
 Route::post('infos/{cart}', [OrderController::class ,'verifyInfo'])->middleware('auth')->name('infoBeforeOrder');
+Route::resource('admin/products' , ProductController::class)->middleware('auth');
+// Route::resource('users', UserController::class)->middleware('auth');
