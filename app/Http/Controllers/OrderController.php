@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cart;
 use App\Models\Order;
 use Illuminate\Http\Request;
 
@@ -33,10 +34,19 @@ class OrderController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Cart $cart)
     {
-        if ($this->authenticatedUser()->hasRole('seller')) {
-
+        if ($this->authenticatedUser()->hasRole('client')) {
+            if (auth()->user()->address) {
+                $order = Order::create([
+                    'user_id' => $this->authenticatedUser()->id,
+                    'cart_id' => $cart->id,
+                    'total' => $cart->total,
+                ]);
+                return redirect()->route('orders.show', $order);
+            } else {
+                return redirect()->route('address.add');
+            }
         } else {
             abort(403);
         }
@@ -48,6 +58,7 @@ class OrderController extends Controller
     public function show(Order $order)
     {
         $this->authorize('view', $order);
+
         return view('orders.show', compact('order'));
     }
 
@@ -73,5 +84,11 @@ class OrderController extends Controller
     public function destroy(Order $order)
     {
         //
+    }
+
+    public function verifyInfo(Cart $cart) {
+        $user = auth()->user();
+        $address = $user->address;
+        return view('client.infoBeforeOrder', compact('cart','address', 'user'));
     }
 }

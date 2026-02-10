@@ -41,7 +41,7 @@
                         <div class="flex text-vortexGreen text-xs gap-1">
                             <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
                         </div>
-                        <span class="text-gray-500 text-[11px] font-sci-fi tracking-widest">256_REVIEWS</span>
+                        <span class="text-gray-500 text-[11px] font-sci-fi tracking-widest">{{ $product->reviews->count() }}_REVIEWS</span>
                     </div>
 
                     <div class="flex items-center gap-4 mb-6">
@@ -98,7 +98,7 @@
             <h3 class="text-sm font-sci-fi font-bold uppercase mb-8 flex items-center gap-3">
                 <span class="w-1 h-4 bg-vortexGreen"></span> Pilot_Feedback
             </h3>
-
+            
             <div class="mb-8 p-4 border border-gray-800 bg-card-bg/50 relative group">
                 <div class="absolute top-0 left-0 w-1 h-full bg-vortexGreen/20 group-hover:bg-vortexGreen transition-colors duration-300"></div>
                 <h4 class="text-xs font-sci-fi text-gray-400 uppercase tracking-widest mb-3">Add_New_Entry</h4>

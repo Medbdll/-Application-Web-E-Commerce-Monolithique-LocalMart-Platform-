@@ -112,12 +112,15 @@
                             </div>
                         </div>
 
+                        <form action="{{ route('infoBeforeOrder' , $cart->id) }}" method="post">
+                            @csrf
                         <button class="w-full bg-vortexGreen hover:bg-white text-black font-display font-bold py-4 px-6 rounded-lg transition-all duration-300 hover:shadow-lg hover:scale-105">
                             <span class="flex items-center justify-center gap-2">
                                 <i class="fa-solid fa-rocket"></i>
                                 Initialize Checkout
                             </span>
                         </button>
+                        </form>
 
                         <form action="{{ route('cart.clear') }}" method="POST" onsubmit="return confirm('Are you sure you want to clear your entire cart?')" class="mt-4">
                             @csrf

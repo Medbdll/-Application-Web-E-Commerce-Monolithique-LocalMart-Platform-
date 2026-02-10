@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\dashboardController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\ProfileController;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
@@ -74,3 +75,6 @@ Route::middleware(['auth', config('jetstream.auth_session'), 'verified', 'role:c
 Route::resource('products', ProductController::class)->middleware('auth');
 Route::resource('categories', CategoryController::class)->middleware('auth');
 
+Route::resource('order', OrderController::class)->middleware('auth');
+
+Route::post('infos/{cart}', [OrderController::class ,'verifyInfo'])->middleware('auth')->name('infoBeforeOrder');
