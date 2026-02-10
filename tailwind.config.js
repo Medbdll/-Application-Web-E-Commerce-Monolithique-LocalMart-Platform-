@@ -17,10 +17,17 @@ export default {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
                 display: ['Orbitron', ...defaultTheme.fontFamily.sans],
+                'sci-fi': ['Orbitron', 'sans-serif'],
+                body: ['Inter', 'sans-serif'],
             },
             colors: {
                 vortexGreen: '#39FF14',
                 cardBg: '#0a0a0a',
+                'neon-green': '#39FF14',
+                'neon-blue': '#00F0FF',
+                'dark-bg': '#050505',
+                'card-bg': '#121212',
+                'card-hover': '#1a1a1a',
             },
         },
     },

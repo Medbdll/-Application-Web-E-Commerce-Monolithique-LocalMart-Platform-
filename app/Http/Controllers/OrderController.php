@@ -16,10 +16,10 @@ class OrderController extends Controller
         if ($this->isAdmin()) {
             $orders = Order::all();
         } else {
-            $orders = Order::where('user_id', $this->authenticatedUser()->id)->get();
+            $orders = Order::where('user_id', $this->authenticatedUser()->id)->latest()->get();
         }
 
-        return $orders;
+        return view('client.orders', compact('orders'));
 
     }
 
@@ -34,19 +34,23 @@ class OrderController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Cart $cart)
+    public function store(Request $request)
     {
         if ($this->authenticatedUser()->hasRole('client')) {
-            if (auth()->user()->address) {
-                $order = Order::create([
-                    'user_id' => $this->authenticatedUser()->id,
-                    'cart_id' => $cart->id,
-                    'total' => $cart->total,
-                ]);
-                return redirect()->route('orders.show', $order);
-            } else {
-                return redirect()->route('address.add');
-            }
+
+            $total = $request->total;
+            $cartId = $request->cart_id;
+            $addressId = $request->address_id;
+            $order = Order::create([
+                'user_id' => $this->authenticatedUser()->id,
+                'cart_id' => $cartId,
+                'total_price' => $total,
+                'address_id' => $addressId,
+                'payment_status' => 'pending',
+                'status' => 'pending',
+            ]);
+
+            return redirect()->route('order.index');
         } else {
             abort(403);
         }
@@ -86,9 +90,11 @@ class OrderController extends Controller
         //
     }
 
-    public function verifyInfo(Cart $cart) {
+    public function verifyInfo(Cart $cart)
+    {
         $user = auth()->user();
         $address = $user->address;
-        return view('client.infoBeforeOrder', compact('cart','address', 'user'));
+
+        return view('client.infoBeforeOrder', compact('cart', 'address', 'user'));
     }
 }
