@@ -18,4 +18,14 @@ abstract class Controller extends BaseController
     {
         return auth()->user()->hasRole('admin');
     }
+
+    protected function isSeller()
+    {
+        return auth()->user()->hasRole('seller');
+    }
+
+    protected function isClient()
+    {
+        return auth()->user()->hasRole('client');
+    }
 }

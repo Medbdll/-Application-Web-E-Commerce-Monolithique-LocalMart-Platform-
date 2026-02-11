@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cart;
+use App\Models\CartItem;
 use App\Models\Order;
+use App\Models\OrderItem;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -14,13 +16,34 @@ class OrderController extends Controller
     public function index()
     {
         if ($this->isAdmin()) {
-            $orders = Order::all();
+            $orders = Order::with(['user', 'items.product'])->latest()->get();
+            return view('dashboard.orders', compact('orders'));
+        } elseif ($this->isClient()) {
+            $orders = Order::where('user_id', $this->authenticatedUser()->id)
+                ->with(['items.product'])
+                ->latest()
+                ->get();
+            return view('client.orders', compact('orders'));
+        } elseif ($this->isSeller()) {
+            // Get order items grouped by order
+            $orderItems = OrderItem::where('seller_id', $this->authenticatedUser()->id)
+                ->with(['order.user', 'product'])  
+                ->latest()
+                ->get()
+                ->groupBy('order_id');
+            
+            $orders = [];
+            foreach ($orderItems as $orderId => $items) {
+                $order = $items->first()->order;
+                $order->items = $items;
+                $orders[] = $order;
+            }
+            
+            return view('dashboard.orders', compact('orders'));
         } else {
-            $orders = Order::where('user_id', $this->authenticatedUser()->id)->latest()->get();
+            // Fallback for users without proper roles
+            abort(403, 'Unauthorized access');
         }
-
-        return view('client.orders', compact('orders'));
-
     }
 
     /**
@@ -49,6 +72,17 @@ class OrderController extends Controller
                 'payment_status' => 'pending',
                 'status' => 'pending',
             ]);
+            $cartItems = CartItem::where('cart_id', $cartId)->get();
+            foreach ($cartItems as $item) {
+                $order->items()->create([
+                    'order_id' => $order->id,
+                    'product_id' => $item->product_id,
+                    'quantity' => $item->quantity,
+                    'price' => $item->price,
+                    'seller_id' => $item->product->seller_id,
+                ]);
+                $item->delete();
+            }
 
             return redirect()->route('order.index');
         } else {
