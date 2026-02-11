@@ -2,46 +2,16 @@
 @section('title', 'Dashboard')
 @section('content')
 
-    <header
-        class="flex justify-between items-center mb-10 bg-black/50 p-4 rounded-2xl border border-gray-900 backdrop-blur-md sticky top-0 z-40">
-        <div class="relative w-96">
-            <input type="text" placeholder="Search for hardware..."
-                   class="w-full bg-[#0d0d0d] border border-gray-800 rounded-xl py-2 px-10 focus:outline-none focus:border-[#39FF14] transition-all text-sm">
-            <svg class="w-4 h-4 absolute left-3 top-3 text-gray-500" fill="none" stroke="currentColor"
-                 viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
-        </div>
 
-        <div class="flex items-center gap-6">
-            <div class="relative">
-                <button class="text-gray-400 hover:text-[#39FF14]">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
-                    </svg>
-                </button>
-                <span
-                    class="absolute -top-1 -right-1 bg-[#39FF14] text-black text-[10px] font-bold px-1.5 rounded-full">3</span>
-            </div>
-            <div class="flex items-center gap-3 pl-6 border-l border-gray-800">
-                <div class="text-right hidden md:block">
-                    <p class="text-sm font-bold">Admin_Vortex</p>
-                    <p class="text-xs text-[#39FF14]">Head Moderator</p>
-                </div>
-                <img src="https://ui-avatars.com/api/?name=Admin+Vortex&background=39FF14&color=000"
-                     class="w-10 h-10 rounded-xl neon-border" alt="Avatar">
-            </div>
-        </div>
-    </header>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
         <div class="bg-black p-6 rounded-2xl border border-gray-900 hover:border-[#39FF14]/50 transition-all group">
             <div class="flex justify-between items-start">
                 <div>
-                    <p class="text-gray-500 text-sm font-semibold uppercase">Total Sales</p>
-                    <h3 class="text-3xl font-gaming font-bold mt-1">$128,430</h3>
+                    <p class="text-gray-500 text-sm font-semibold uppercase">
+                        {{ $statistics['role'] === 'seller' ? 'My Sales' : 'Total Sales' }}
+                    </p>
+                    <h3 class="text-3xl font-gaming font-bold mt-1">${{ $statistics['total_sales'] ?? '0' }}</h3>
                 </div>
                 <div class="bg-[#39FF14]/10 p-3 rounded-lg text-[#39FF14] group-hover:neon-glow">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -50,19 +20,25 @@
                     </svg>
                 </div>
             </div>
-            <p class="text-xs text-green-400 mt-4 flex items-center gap-1">
-                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                        d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z"></path>
-                </svg>
-                +12.5% vs last month
+            <p class="text-xs {{ $statistics['sales_growth'] >= 0 ? 'text-green-400' : 'text-red-500' }} mt-4 flex items-center gap-1">
+                @if($statistics['sales_growth'] >= 0)
+                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z"></path>
+                    </svg>
+                    +{{ $statistics['sales_growth'] }}% vs last month
+                @else
+                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z"></path>
+                    </svg>
+                    {{ $statistics['sales_growth'] }}% vs last month
+                @endif
             </p>
         </div>
         <div class="bg-black p-6 rounded-2xl border border-gray-900 hover:border-[#39FF14]/50 transition-all group">
             <div class="flex justify-between items-start">
                 <div>
                     <p class="text-gray-500 text-sm font-semibold uppercase">Active Orders</p>
-                    <h3 class="text-3xl font-gaming font-bold mt-1">482</h3>
+                    <h3 class="text-3xl font-gaming font-bold mt-1">{{ $statistics['active_orders'] ?? '0' }}</h3>
                 </div>
                 <div class="bg-[#39FF14]/10 p-3 rounded-lg text-[#39FF14] group-hover:neon-glow">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -71,28 +47,40 @@
                     </svg>
                 </div>
             </div>
-            <p class="text-xs text-yellow-500 mt-4">12 Pending verification</p>
+            <p class="text-xs text-yellow-500 mt-4">
+                {{ $statistics['pending_verification'] ?? $statistics['pending_orders'] ?? '0' }} Pending verification
+            </p>
         </div>
         <div class="bg-black p-6 rounded-2xl border border-gray-900 hover:border-[#39FF14]/50 transition-all group">
             <div class="flex justify-between items-start">
                 <div>
-                    <p class="text-gray-500 text-sm font-semibold uppercase">Total Users</p>
-                    <h3 class="text-3xl font-gaming font-bold mt-1">12,840</h3>
+                    <p class="text-gray-500 text-sm font-semibold uppercase">
+                        {{ $statistics['role'] === 'seller' ? 'My Products' : ($statistics['role'] === 'moderator' ? 'Active Users' : 'Total Users') }}
+                    </p>
+                    <h3 class="text-3xl font-gaming font-bold mt-1">
+                        {{ $statistics['total_products'] ?? $statistics['active_users'] ?? $statistics['total_users'] ?? '0' }}
+                    </h3>
                 </div>
                 <div class="bg-[#39FF14]/10 p-3 rounded-lg text-[#39FF14] group-hover:neon-glow">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.0 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                     </svg>
                 </div>
             </div>
-            <p class="text-xs text-green-400 mt-4">+84 New today</p>
+            <p class="text-xs text-green-400 mt-4">
+                {{ $statistics['new_users_today'] ?? $statistics['new_orders_today'] ?? '+0' }} New today
+            </p>
         </div>
         <div class="bg-black p-6 rounded-2xl border border-gray-900 hover:border-[#39FF14]/50 transition-all group">
             <div class="flex justify-between items-start">
                 <div>
-                    <p class="text-gray-500 text-sm font-semibold uppercase">Stock Level</p>
-                    <h3 class="text-3xl font-gaming font-bold mt-1">94%</h3>
+                    <p class="text-gray-500 text-sm font-semibold uppercase">
+                        {{ $statistics['role'] === 'moderator' ? 'Pending Reviews' : 'Stock Level' }}
+                    </p>
+                    <h3 class="text-3xl font-gaming font-bold mt-1">
+                        {{ $statistics['role'] === 'moderator' ? ($statistics['pending_reviews'] ?? '0') : ($statistics['stock_level'] ?? '0') . '%' }}
+                    </h3>
                 </div>
                 <div class="bg-[#39FF14]/10 p-3 rounded-lg text-[#39FF14] group-hover:neon-glow">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -101,14 +89,18 @@
                     </svg>
                 </div>
             </div>
-            <p class="text-xs text-red-500 mt-4">3 Items low in stock</p>
+            <p class="text-xs {{ $statistics['low_stock_items'] > 0 ? 'text-red-500' : 'text-green-400' }} mt-4">
+                {{ $statistics['role'] === 'moderator' ? ($statistics['reported_products'] ?? '0') . ' Reported products' : ($statistics['low_stock_items'] ?? '0') . ' Items low in stock' }}
+            </p>
         </div>
     </div>
 
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
         <div class="xl:col-span-2 bg-black border border-gray-900 rounded-3xl overflow-hidden shadow-2xl">
             <div class="p-6 border-b border-gray-900 flex justify-between items-center bg-gray-900/20">
-                <h2 class="text-xl font-gaming font-bold tracking-wide">Recent Acquisitions</h2>
+                <h2 class="text-xl font-gaming font-bold tracking-wide">
+                    {{ $statistics['role'] === 'seller' ? 'My Recent Orders' : 'Recent Acquisitions' }}
+                </h2>
                 <button class="text-[#39FF14] text-sm hover:underline">View All</button>
             </div>
             <div class="overflow-x-auto">
@@ -123,56 +115,43 @@
                     </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-900">
+                    @forelse($statistics['recent_orders'] ?? [] as $order)
                     <tr class="hover:bg-gray-900/40 transition-colors">
-                        <td class="px-6 py-4 font-gaming text-[#39FF14]">#VX-9921</td>
+                        <td class="px-6 py-4 font-gaming text-[#39FF14]">#VX-{{ str_pad($order->id, 4, '0', STR_PAD_LEFT) }}</td>
                         <td class="px-6 py-4">
                             <div class="flex items-center gap-3">
                                 <div class="w-8 h-8 rounded-lg bg-gray-800 flex items-center justify-center text-xs">
-                                    AM
+                                    {{ strtoupper(substr($order->user->name ?? 'UN', 0, 2)) }}
                                 </div>
-                                <span>Alex Mercer</span>
+                                <span>{{ $order->user->name ?? 'Unknown' }}</span>
                             </div>
                         </td>
-                        <td class="px-6 py-4 font-bold">$1,299.00</td>
+                        <td class="px-6 py-4 font-bold">${{ number_format($order->total_price, 2) }}</td>
                         <td class="px-6 py-4">
-                            <span
-                                class="px-3 py-1 bg-green-500/10 text-green-500 rounded-full text-[10px] font-bold border border-green-500/20">SHIPPED</span>
+                            <span class="px-3 py-1 
+                                {{ $order->status === 'shipped' ? 'bg-green-500/10 text-green-500 border-green-500/20' : 
+                                   ($order->status === 'pending' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' : 
+                                   'bg-blue-500/10 text-blue-500 border-blue-500/20') }} 
+                                rounded-full text-[10px] font-bold border">
+                                {{ strtoupper($order->status) }}
+                            </span>
                         </td>
                         <td class="px-6 py-4">
                             <button class="text-gray-400 hover:text-white">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                    <path
-                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                    <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                                 </svg>
                             </button>
                         </td>
                     </tr>
-                    <tr class="hover:bg-gray-900/40 transition-colors">
-                        <td class="px-6 py-4 font-gaming text-[#39FF14]">#VX-9920</td>
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-lg bg-gray-800 flex items-center justify-center text-xs">
-                                    SK
-                                </div>
-                                <span>Sombra K.</span>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 font-bold">$349.00</td>
-                        <td class="px-6 py-4">
-                            <span
-                                class="px-3 py-1 bg-yellow-500/10 text-yellow-500 rounded-full text-[10px] font-bold border border-yellow-500/20">PENDING</span>
-                        </td>
-                        <td class="px-6 py-4">
-                            <button class="text-gray-400 hover:text-white">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                    <path
-                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                </svg>
-                            </button>
+                    @empty
+                    <tr>
+                        <td colspan="5" class="px-6 py-8 text-center text-gray-500">
+                            No recent orders found
                         </td>
                     </tr>
+                    @endforelse
                     </tbody>
                 </table>
             </div>

@@ -40,20 +40,14 @@ class UserFactory extends Factory
     }
 
     public function configure()
-{
-    return $this->afterCreating(function (\App\Models\User $user) {
-        // Create cart for the user
-        \App\Models\Cart::create([
-            'user_id' => $user->id,
-        ]);
-
-        // Assign a random role if not specified
-        if (!$user->hasAnyRole()) {
-            $roles = ['client', 'seller', 'admin', 'moderator'];
-            $user->assignRole(fake()->randomElement($roles));
-        }
-    });
-}
+    {
+        return $this->afterCreating(function (\App\Models\User $user) {
+            // Create cart for the user
+            \App\Models\Cart::create([
+                'user_id' => $user->id,
+            ]);
+        });
+    }
 
     /**
      * Indicate that the model's email address should be unverified.
