@@ -70,7 +70,7 @@ class OrderController extends Controller
                 'total_price' => $total,
                 'address_id' => $addressId,
                 'payment_status' => 'pending',
-                'status' => 'pending',
+                'payment_status' => 'pending',
             ]);
             $cartItems = CartItem::where('cart_id', $cartId)->get();
             foreach ($cartItems as $item) {
@@ -79,7 +79,7 @@ class OrderController extends Controller
                     'product_id' => $item->product_id,
                     'quantity' => $item->quantity,
                     'price' => $item->price,
-                    'seller_id' => $item->product->seller_id,
+                    'seller_id' => $item->product->user_id,
                 ]);
                 $item->delete();
             }
@@ -128,7 +128,11 @@ class OrderController extends Controller
     {
         $user = auth()->user();
         $address = $user->address;
-
-        return view('client.infoBeforeOrder', compact('cart', 'address', 'user'));
+        if(!$address){
+            $addressExist = false;
+        }else{
+            $addressExist = true;
+        }
+        return view('client.infoBeforeOrder', compact('cart', 'address', 'user', 'addressExist'));
     }
 }

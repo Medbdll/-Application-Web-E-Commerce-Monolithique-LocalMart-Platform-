@@ -65,10 +65,17 @@
                             </div>
 
                             <div class="pt-6 text-right">
+                                @if ($addressExist)
                                 <a href="{{ route('profile.edit') }}"
                                     class="text-sm font-sci-fi uppercase tracking-widest text-gray-400 hover:text-vortexGreen transition">
                                     Edit Information <i class="fa-solid fa-arrow-right ml-2"></i>
                                 </a>
+                                @else
+                                <a href="{{ route('profile.edit') }}"
+                                    class="text-sm font-sci-fi uppercase tracking-widest text-gray-400 hover:text-vortexGreen transition">
+                                    Add Information <i class="fa-solid fa-arrow-right ml-2"></i>
+                                </a>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -101,10 +108,14 @@
 
                         <form action="{{ route('order.store') }}" method="POST">
                             @csrf
+                            @if ($addressExist)
                             <input type="hidden" name="address_id" value="{{ $address->id }}">
+                            @else
+                            <input type="hidden" name="address_id" value="">
+                            @endif
                             <input type="hidden" name="cart_id" value="{{ $cart->id }}">
                             <input type="hidden" name="total" value="{{ $cart->total }}">
-                            @if(!$address->address_line1 || !$address->city || !$address->postal_code || !$address->phone)
+                            @if(!$addressExist || !$address->address_line1 || !$address->city || !$address->postal_code || !$address->phone)
                                 <button type="button" disabled
                                     class="w-full bg-gray-600 cursor-not-allowed text-gray-400 font-display font-bold py-4 px-6 rounded-lg">
                                     <span class="flex items-center justify-center gap-2">

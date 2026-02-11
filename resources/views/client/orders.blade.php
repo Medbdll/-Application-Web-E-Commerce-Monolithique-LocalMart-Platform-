@@ -65,19 +65,23 @@
                         @foreach ($order->items as $item)
                             <div
                                 class="p-4 md:p-6 flex flex-col md:flex-row md:items-center gap-6 hover:bg-white/[0.02] transition-colors">
-                                <div class="flex items-center gap-4 flex-grow">
+                                <div class="flex items-center gap-3 flex-grow">
                                     <div class="relative">
                                         <img src="{{ $item->product->image_url }}"
-                                            class="w-16 h-16 object-cover border border-gray-700 grayscale hover:grayscale-0 transition-all">
-                                        <div class="absolute -top-2 -left-2 bg-neon-green text-black text-[10px] font-bold px-1">
-                                            x{{ $item->quantity }}
+                                            class="w-14 h-14 object-cover border border-gray-700 rounded hover:grayscale-0 transition-all">
+                                        <div class="absolute -top-2 -right-2 bg-neon-green text-black text-[10px] font-bold px-1.5 py-0.5 rounded-full border border-black shadow-lg shadow-neon-green/50">
+                                            {{ $item->quantity }}
                                         </div>
                                     </div>
-                                    <div>
-                                        <h4 class="text-white font-bold uppercase tracking-tight">{{ $item->product->name }}</h4>
-                                        <p class="text-[10px] text-gray-500 uppercase italic">Vendor: <span
+                                    <div class="flex-grow">
+                                        <h4 class="text-white font-bold uppercase tracking-tight text-sm">{{ $item->product->name }}</h4>
+                                        <p class="text-[9px] text-gray-500 uppercase italic">Vendor: <span
                                                 class="text-gray-300">{{ $item->product->seller->name ?? 'Unknown Seller' }}</span>
                                         </p>
+                                        <div class="flex items-center gap-3 mt-1">
+                                            <span class="text-gray-400 text-[9px]">Unit: <span class="text-white font-semibold">${{ number_format($item->price, 2) }}</span></span>
+                                            <span class="text-gray-400 text-[9px]">Qty: <span class="text-neon-green font-bold">{{ $item->quantity }}</span></span>
+                                        </div>
                                     </div>
                                 </div>
 
