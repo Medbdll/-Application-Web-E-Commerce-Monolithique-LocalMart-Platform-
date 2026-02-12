@@ -22,6 +22,18 @@ class RouteRestrictions
         /** @var User $user */
         $user = Auth::user();
 
+        // Prevent banned users from accessing the platform
+        if ($user->status === 'banned') {
+            Auth::logout();
+            abort(403, 'Your account has been banned from the platform.');
+        }
+
+        // Prevent suspended users from accessing the platform
+        if ($user->status === 'suspended') {
+            Auth::logout();
+            abort(403, 'Your account has been suspended. Please contact support.');
+        }
+
         // Prevent admin/seller/moderator from accessing client home page
         if ($request->route()->named('home') && $user->hasRole(['admin', 'seller', 'moderator'])) {
             abort(403, 'Admin users cannot access client home page.');

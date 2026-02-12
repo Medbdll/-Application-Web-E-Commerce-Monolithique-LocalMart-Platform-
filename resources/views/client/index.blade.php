@@ -5,20 +5,54 @@
     <x-categories :categories="$categories"/>
 
     <section class="max-w-7xl mx-auto px-6 py-6 mb-8">
-        <div class="flex flex-col md:flex-row justify-between items-end gap-6">
-            <div>
-                <h1 class="text-2xl md:text-3xl font-display font-bold text-vortexGreen uppercase leading-tight tracking-wide">
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+            <div class="w-full lg:w-auto">
+                <h1 class="text-3xl md:text-4xl font-display font-bold text-vortexGreen uppercase leading-tight tracking-wide mb-2">
                     Discover all our products.
                 </h1>
-                <p class="text-gray-400 mt-1 text-sm">Desktops, keyboards, laptops & more</p>
+                <p class="text-gray-400 text-sm md:text-base">Desktops, keyboards, laptops & more</p>
+                <div class="mt-4 flex items-center gap-4">
+                    <span class="text-sm text-gray-500">{{ $products->total() }} products found</span>
+                    @if(request()->has('search'))
+                        <span class="text-sm text-vortexGreen">Showing results for "{{ request('search') }}"</span>
+                    @endif
+                </div>
             </div>
 
-            <div class="relative w-full md:w-[400px]">
-                <input type="text"
-                       placeholder="SEARCH FOR A PRODUCT"
-                       class="w-full bg-transparent border border-gray-700 text-white px-4 py-4 pr-12 focus:outline-none focus:border-neon focus:ring-1 focus:ring-neon transition-all duration-300 placeholder-gray-500 text-sm tracking-wider font-semibold rounded-sm">
-                <i class="fa-solid fa-magnifying-glass absolute right-4 top-5 text-gray-400"></i>
+            <div class="w-full lg:w-[400px]">
+                <form method="GET" action="{{ route('home') }}" class="relative">
+                    <input type="text"
+                           name="search"
+                           value="{{ request('search') }}"
+                           placeholder="SEARCH FOR A PRODUCT"
+                           class="w-full bg-transparent border border-gray-700 text-white px-4 py-4 pr-12 focus:outline-none focus:border-neon focus:ring-2 focus:ring-neon/20 transition-all duration-300 placeholder-gray-500 text-sm tracking-wider font-semibold rounded-sm">
+                    <button type="submit" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-neon transition-colors duration-300">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                </form>
             </div>
+        </div>
+        
+        <!-- Filters and Sort -->
+        <div class="mt-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div class="flex flex-wrap gap-2">
+                <button class="px-4 py-2 bg-neon/10 border border-neon/30 text-neon text-sm font-medium rounded-sm hover:bg-neon/20 transition-all duration-300">
+                    All Products
+                </button>
+                <button class="px-4 py-2 bg-transparent border border-gray-700 text-gray-400 text-sm font-medium rounded-sm hover:border-neon hover:text-neon transition-all duration-300">
+                    In Stock
+                </button>
+                <button class="px-4 py-2 bg-transparent border border-gray-700 text-gray-400 text-sm font-medium rounded-sm hover:border-neon hover:text-neon transition-all duration-300">
+                    On Sale
+                </button>
+            </div>
+            
+            <select class="bg-transparent border border-gray-700 text-white px-4 py-2 focus:outline-none focus:border-neon text-sm font-medium rounded-sm">
+                <option>Sort by: Latest</option>
+                <option>Sort by: Price (Low to High)</option>
+                <option>Sort by: Price (High to Low)</option>
+                <option>Sort by: Name (A-Z)</option>
+            </select>
         </div>
     </section>
 
