@@ -7,7 +7,9 @@
             <h2 class="text-3xl font-gaming font-bold text-white tracking-wide">User Database</h2>
             <p class="text-gray-500 text-sm mt-1">Manage accounts, permissions, and security status.</p>
         </div>
+        @can('admin')
         <livewire:create-user-form />
+        @endcan
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -20,15 +22,18 @@
                 <p class="text-2xl font-gaming font-bold text-white">{{ $total_users}}</p>
             </div>
         </div>
+        @can('admin')
         <div class="bg-black border border-gray-900 p-5 rounded-xl flex items-center gap-4">
             <div class="p-3 bg-purple-500/10 rounded-lg text-purple-500">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
             </div>
+            
             <div>
                 <p class="text-gray-500 text-xs font-bold uppercase">Active Sellers</p>
                 <p class="text-2xl font-gaming font-bold text-white">{{ $sellers }}</p>
             </div>
         </div>
+        @endcan
         <div class="bg-black border border-gray-900 p-5 rounded-xl flex items-center gap-4">
             <div class="p-3 bg-red-500/10 rounded-lg text-red-500">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
