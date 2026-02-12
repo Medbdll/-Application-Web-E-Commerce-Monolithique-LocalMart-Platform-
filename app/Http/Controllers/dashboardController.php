@@ -143,6 +143,8 @@ class dashboardController extends Controller
             'active_users' => $activeUsers,
             'total_orders' => $totalOrders,
             'pending_orders' => $pendingOrders,
+            'sales_growth' => 0,
+            'low_stock_items' => 0,
             'role' => 'moderator'
         ];
     }
