@@ -28,6 +28,14 @@ class CreateNewUser implements CreatesNewUsers
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
         ])->validate();
 
+        // Check if user with this email was previously banned
+        $bannedUser = User::withTrashed()->where('email', $input['email'])->where('status', 'banned')->first();
+        if ($bannedUser) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'email' => ['This email address has been banned from the platform.'],
+            ]);
+        }
+
         return DB::transaction(function () use ($input) {
             return tap(User::create([
                 'name' => $input['name'],
