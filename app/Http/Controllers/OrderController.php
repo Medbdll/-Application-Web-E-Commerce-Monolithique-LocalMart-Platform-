@@ -16,16 +16,12 @@ class OrderController extends Controller
     public function index()
     {
         if ($this->isAdmin()) {
+
             $orders = Order::with(['user', 'items.product'])->latest()->get();
             return view('dashboard.orders', compact('orders'));
-        } elseif ($this->isClient()) {
-            $orders = Order::where('user_id', $this->authenticatedUser()->id)
-                ->with(['items.product'])
-                ->latest()
-                ->get();
-            return view('client.orders', compact('orders'));
+
         } elseif ($this->isSeller()) {
-            // Get order items grouped by order
+
             $orderItems = OrderItem::where('seller_id', $this->authenticatedUser()->id)
                 ->with(['order.user', 'product'])  
                 ->latest()
@@ -40,8 +36,15 @@ class OrderController extends Controller
             }
             
             return view('dashboard.orders', compact('orders'));
+        } elseif ($this->isClient()) {
+
+            $orders = Order::where('user_id', $this->authenticatedUser()->id)
+                ->with(['items.product'])
+                ->latest()
+                ->get();
+            return view('client.orders', compact('orders'));
+
         } else {
-            // Fallback for users without proper roles
             abort(403, 'Unauthorized access');
         }
     }
