@@ -79,6 +79,7 @@ Route::middleware(['auth', config('jetstream.auth_session'), 'verified', 'role:a
 
 Route::middleware(['auth', config('jetstream.auth_session'), 'verified', 'role:client', 'route.restrictions'])->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
+    Route::get('/category/{slug}', [CategoryController::class, 'showProducts'])->name('category.products');
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
     Route::put('/cart/{cartItem}', [CartController::class, 'update'])->name('cart.update');
