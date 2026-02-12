@@ -45,6 +45,22 @@ class CategoryController extends Controller
         return response()->json($category->load('products'));
     }
 
+    public function showProducts($slug)
+    {
+        $category = Category::where('slug', $slug)->firstOrFail();
+        $products = $category->products()
+            ->when(request('search'), function($query, $search) {
+                $query->where('name', 'like', "%{$search}%")
+                      ->orWhere('description', 'like', "%{$search}%");
+            })
+            ->latest()
+            ->paginate(12);
+            
+        $categories = Category::latest()->get();
+        
+        return view('client.category-products', compact('category', 'products', 'categories'));
+    }
+
     public function edit(Category $category)
     {
         if (auth()->user()->hasRole(['admin', 'moderator'])) {
