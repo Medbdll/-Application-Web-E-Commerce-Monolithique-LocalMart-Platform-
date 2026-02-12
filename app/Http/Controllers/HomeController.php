@@ -9,7 +9,14 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $products = Product::latest()->get();
+        $products = Product::query()
+            ->when(request('search'), function($query, $search) {
+                $query->where('name', 'like', "%{$search}%")
+                      ->orWhere('description', 'like', "%{$search}%");
+            })
+            ->latest()
+            ->paginate(12);
+            
         $categories = Category::latest()->get();
         return view('client.index', compact('products', 'categories'));
     }

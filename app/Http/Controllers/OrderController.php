@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\AdminEmail;
+use App\Mail\SellerEmail;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class OrderController extends Controller
 {
@@ -80,6 +84,7 @@ class OrderController extends Controller
                 'cart_id' => $cartId,
                 'total_price' => $total,
                 'address_id' => $addressId,
+                'payment_status' => 'pending',
             ]);
             $cartItems = CartItem::with('product')->where('cart_id', $cartId)->get();
             foreach ($cartItems as $item) {
@@ -97,8 +102,10 @@ class OrderController extends Controller
                     'price' => $item->price,
                     'seller_id' => $item->product->user_id,
                 ]);
+
                 $item->delete();
             }
+
 
             return redirect()->route('order.index');
         } else {
@@ -144,7 +151,7 @@ class OrderController extends Controller
     {
         $user = auth()->user();
         $address = $user->address;
-        if (! $address) {
+        if (!$address) {
             $addressExist = false;
         } else {
             $addressExist = true;
@@ -152,4 +159,5 @@ class OrderController extends Controller
 
         return view('client.infoBeforeOrder', compact('cart', 'address', 'user', 'addressExist'));
     }
+
 }

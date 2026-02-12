@@ -26,8 +26,7 @@ class CategoryTable extends Component
 
     public function edit($id)
     {
-        $this->dispatch('editCategory', id: $id)
-            ->to(CategoryForm::class);
+        $this->emitTo('category-form', 'editCategory', $id);
     }
 
     public function render()

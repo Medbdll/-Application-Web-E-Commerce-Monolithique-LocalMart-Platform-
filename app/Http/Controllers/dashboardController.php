@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\OrderItem;
 use Illuminate\Support\Facades\DB;
 
 class dashboardController extends Controller
@@ -31,22 +32,22 @@ class dashboardController extends Controller
     }
     private function getAdminStatistics()
     {
-        $totalSales = Order::sum('total_price');
-        $activeOrders = Order::where('status', 'pending')->orWhere('status', 'processing')->count();
+        $totalSales = OrderItem::sum('price');
+        $activeOrders = OrderItem::where('status', 'pending')->orWhere('status', 'processing')->count();
         $totalUsers = User::count();
         $lowStockProducts = Product::where('stock', '<', 10)->count();
         
         // Calculate monthly growth
-        $lastMonthSales = Order::whereMonth('created_at', now()->subMonth()->month)
+        $lastMonthSales = OrderItem::whereMonth('created_at', now()->subMonth()->month)
                                ->whereYear('created_at', now()->subMonth()->year)
-                               ->sum('total_price');
-        $currentMonthSales = Order::whereMonth('created_at', now()->month)
+                               ->sum('price');
+        $currentMonthSales = OrderItem::whereMonth('created_at', now()->month)
                                  ->whereYear('created_at', now()->year)
-                                 ->sum('total_price');
+                                 ->sum('price');
         $salesGrowth = $lastMonthSales > 0 ? (($currentMonthSales - $lastMonthSales) / $lastMonthSales) * 100 : 0;
         
         $newUsersToday = User::whereDate('created_at', today())->count();
-        $pendingVerification = Order::where('status', 'pending')->count();
+        $pendingVerification = OrderItem::where('status', 'pending')->count();
         
         return [
             'total_sales' => number_format($totalSales, 2),
@@ -57,7 +58,7 @@ class dashboardController extends Controller
             'new_users_today' => $newUsersToday,
             'pending_verification' => $pendingVerification,
             'low_stock_items' => $lowStockProducts,
-            'recent_orders' => Order::with('user')->latest()->take(5)->get(),
+            'recent_orders' => OrderItem::with('order.user')->latest()->take(5)->get(),
             'role' => 'admin'
         ];
     }
@@ -70,12 +71,12 @@ class dashboardController extends Controller
         $sellerProducts = Product::where('user_id', $user->id);
         
         // Get total sales
-        $totalSales = Order::whereHas('items.product', function($query) use ($user) {
+        $totalSales = OrderItem::whereHas('items.product', function($query) use ($user) {
             $query->where('user_id', $user->id);
-        })->sum('total_price');
+        })->sum('price');
         
         // Get active orders
-        $activeOrders = Order::whereHas('items.product', function($query) use ($user) {
+        $activeOrders = OrderItem::whereHas('items.product', function($query) use ($user) {
             $query->where('user_id', $user->id);
         })->where(function($query) {
             $query->where('status', 'pending')->orWhere('status', 'processing');
@@ -85,25 +86,25 @@ class dashboardController extends Controller
         $lowStockProducts = $sellerProducts->where('stock', '<', 10)->count();
         
         // Calculate monthly growth
-        $lastMonthSales = Order::whereHas('items.product', function($query) use ($user) {
+        $lastMonthSales = OrderItem::whereHas('items.product', function($query) use ($user) {
             $query->where('user_id', $user->id);
         })->whereMonth('created_at', now()->subMonth()->month)
           ->whereYear('created_at', now()->subMonth()->year)
-          ->sum('total_price');
+          ->sum('price');
           
-        $currentMonthSales = Order::whereHas('items.product', function($query) use ($user) {
+        $currentMonthSales = OrderItem::whereHas('items.product', function($query) use ($user) {
             $query->where('user_id', $user->id);
         })->whereMonth('created_at', now()->month)
           ->whereYear('created_at', now()->year)
-          ->sum('total_price');
+          ->sum('price');
           
         $salesGrowth = $lastMonthSales > 0 ? (($currentMonthSales - $lastMonthSales) / $lastMonthSales) * 100 : 0;
         
-        $newOrdersToday = Order::whereHas('items.product', function($query) use ($user) {
+        $newOrdersToday = OrderItem::whereHas('items.product', function($query) use ($user) {
             $query->where('user_id', $user->id);
         })->whereDate('created_at', today())->count();
         
-        $pendingOrders = Order::whereHas('items.product', function($query) use ($user) {
+        $pendingOrders = OrderItem::whereHas('items.product', function($query) use ($user) {
             $query->where('user_id', $user->id);
         })->where('status', 'pending')->count();
         
@@ -116,9 +117,9 @@ class dashboardController extends Controller
             'new_orders_today' => $newOrdersToday,
             'pending_orders' => $pendingOrders,
             'low_stock_items' => $lowStockProducts,
-            'recent_orders' => Order::whereHas('items.product', function($query) use ($user) {
+            'recent_orders' => OrderItem::whereHas('items.product', function($query) use ($user) {
                 $query->where('user_id', $user->id);
-            })->with('user')->latest()->take(5)->get(),
+            })->with('order.user')->latest()->take(5)->get(),
             'role' => 'seller'
         ];
     }
@@ -133,8 +134,8 @@ class dashboardController extends Controller
         $suspendedUsers = User::where('status', 'suspended')->count();
         $activeUsers = User::where('status', 'active')->count();
         
-        $totalOrders = Order::count();
-        $pendingOrders = Order::where('status', 'pending')->count();
+        $totalOrders = OrderItem::count();
+        $pendingOrders = OrderItem::where('status', 'pending')->count();
         
         return [
             'pending_reviews' => $pendingReviews,
@@ -143,6 +144,8 @@ class dashboardController extends Controller
             'active_users' => $activeUsers,
             'total_orders' => $totalOrders,
             'pending_orders' => $pendingOrders,
+            'sales_growth' => 0,
+            'low_stock_items' => 0,
             'role' => 'moderator'
         ];
     }
