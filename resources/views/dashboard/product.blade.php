@@ -20,7 +20,10 @@
         @endif
     </div>
 
+
     <livewire:product-form />
     <livewire:product-table/>
 
 @endsection
+
+

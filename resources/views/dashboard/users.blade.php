@@ -7,10 +7,7 @@
             <h2 class="text-3xl font-gaming font-bold text-white tracking-wide">User Database</h2>
             <p class="text-gray-500 text-sm mt-1">Manage accounts, permissions, and security status.</p>
         </div>
-        <button class="bg-[#39FF14] text-black font-bold py-2.5 px-6 rounded-lg hover:shadow-[0_0_20px_rgba(57,255,20,0.4)] transition-all flex items-center gap-2 uppercase tracking-wider text-xs">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
-            Create Account
-        </button>
+        <livewire:create-user-form />
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
