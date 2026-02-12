@@ -14,6 +14,7 @@ use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Fortify\Http\Controllers\RegisteredUserController;
 use Laravel\Fortify\Http\Controllers\PasswordResetLinkController;
 use Laravel\Fortify\Http\Controllers\NewPasswordController;
+use Illuminate\Support\Facades\Mail;
 
 // Role-based redirect route
 Route::get('/', function () {
@@ -29,13 +30,13 @@ Route::get('/', function () {
 Route::middleware('guest')->group(function () {
     Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('login');
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
-    
+
     Route::get('register', [RegisteredUserController::class, 'create'])->name('register');
     Route::post('register', [RegisteredUserController::class, 'store']);
-    
+
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])->name('password.request');
     Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])->name('password.email');
-    
+
     Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])->name('password.reset');
     Route::post('reset-password', [NewPasswordController::class, 'store'])->name('password.update');
 });
@@ -44,7 +45,7 @@ Route::middleware(['auth', config('jetstream.auth_session'), 'verified', 'role:a
     Route::get('/dashboard/profile', [ProfileController::class, 'edit'])->name('dashboard.profile');
     Route::put('/dashboard/profile', [ProfileController::class, 'update'])->name('dashboard.profile.update');
     Route::delete('/dashboard/profile', [ProfileController::class, 'destroy'])->name('dashboard.profile.destroy');
-    
+
     Route::get('/api-tokens', function () {
         return view('api-tokens.index');
     })->name('api-tokens.index');
@@ -83,3 +84,5 @@ Route::resource('order', OrderController::class)->middleware('auth');
 Route::post('infos/{cart}', [OrderController::class ,'verifyInfo'])->middleware('auth')->name('infoBeforeOrder');
 Route::resource('admin/products' , ProductController::class)->middleware('auth');
 // Route::resource('users', UserController::class)->middleware('auth');
+
+
