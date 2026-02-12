@@ -23,7 +23,7 @@
                 <tr>
                     <td style="padding:30px 40px 10px 40px;">
                         <h2 style="margin:0; font-size:18px; font-weight:600; color:#111827;">
-                            {{ $app_name ?? 'Marketplace Admin' }}
+                             Vortex Marketplace Admin
                         </h2>
                     </td>
                 </tr>
@@ -67,8 +67,7 @@
                                     <strong>Product ID</strong><br>
                                     #{{ $product_id }}<br><br>
 
-                                    <strong>Submitted At</strong><br>
-                                    {{ $submitted_at }}
+
 
                                 </td>
                             </tr>
@@ -77,19 +76,10 @@
                 </tr>
 
                 <!-- CTA -->
-                <tr>
-                    <td align="left" style="padding:10px 40px 30px 40px;">
-                        <a href="{{ $review_link ?? '#' }}"
-                           style="background-color:#2563eb; color:#ffffff; text-decoration:none; padding:12px 22px; font-size:14px; font-weight:600; border-radius:6px; display:inline-block;">
-                            Review Product
-                        </a>
-                    </td>
-                </tr>
-
                 <!-- Footer -->
                 <tr>
                     <td style="padding:20px 40px 40px 40px; font-size:12px; color:#6b7280;">
-                        This is an automated notification from {{ $app_name ?? 'your marketplace system' }}.
+                        This is an automated notification from  Vortex your marketplace system .
                     </td>
                 </tr>
 

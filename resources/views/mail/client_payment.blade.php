@@ -100,7 +100,7 @@
                             {{ $support_email ?? 'support@example.com' }}
                         </a>.<br><br>
 
-                        © {{ date('Y') }} {{ $app_name ?? 'Your Store' }}. All rights reserved.
+                        © {{ date('Y') }} vortex Your Store All rights reserved.
                     </td>
                 </tr>
 

@@ -88,7 +88,7 @@
                 <!-- Footer -->
                 <tr>
                     <td style="padding:20px 40px 40px 40px; font-size:12px; color:#6b7280;">
-                        This is an automated notification from {{ $app_name ?? 'your marketplace system' }}.
+                        This is an automated notification from Vortex your marketplace system.
                     </td>
                 </tr>
 

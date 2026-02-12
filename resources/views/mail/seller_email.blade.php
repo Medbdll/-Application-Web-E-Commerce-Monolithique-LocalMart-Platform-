@@ -18,7 +18,7 @@
 <tr>
 <td style="padding:30px 30px 20px 30px; text-align:center;">
 <h1 style="margin:0; font-size:20px; color:#111827; font-weight:600;">
-{{ $app_name ?? 'Your Marketplace' }}
+Vortex
 </h1>
 </td>
 </tr>
@@ -53,7 +53,7 @@ Order ID: <strong>#{{ $order_id ?? '000123' }}</strong>
 <strong>Product:</strong> {{ $product_name ?? 'Product Name' }}<br>
 <strong>Quantity:</strong> {{ $quantity ?? '1' }}<br>
 <strong>Total:</strong> ${{ $total_amount ?? '00.00' }}<br>
-<strong>Payment Status:</strong> {{ $payment_status ?? 'Paid' }}
+<strong>Payment Status:</strong> {{ $payment_status ?? 'Pending' }}
 
 </td>
 </tr>
@@ -64,7 +64,7 @@ Order ID: <strong>#{{ $order_id ?? '000123' }}</strong>
 <!-- CTA -->
 <tr>
 <td align="center" style="padding:10px 30px 30px 30px;">
-<a href="{{ $order_link ?? '#' }}" 
+<a href="{{ $order_link ?? '#' }}"
 style="background-color:#16a34a; color:#ffffff; text-decoration:none; padding:14px 28px; font-size:15px; font-weight:bold; border-radius:5px; display:inline-block;">
 View Order Details
 </a>
@@ -75,7 +75,7 @@ View Order Details
 <tr>
 <td style="padding:20px 30px 30px 30px; text-align:center; font-size:12px; color:#9ca3af; line-height:18px;">
 Please process this order as soon as possible.<br><br>
-© {{ date('Y') }} {{ $app_name ?? 'Your Marketplace' }}. All rights reserved.
+© {{ date('Y') }} Vortex Your Marketplace All rights reserved.
 </td>
 </tr>
 
