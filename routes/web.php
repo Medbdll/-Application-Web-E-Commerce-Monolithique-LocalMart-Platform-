@@ -14,6 +14,7 @@ use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Fortify\Http\Controllers\RegisteredUserController;
 use Laravel\Fortify\Http\Controllers\PasswordResetLinkController;
 use Laravel\Fortify\Http\Controllers\NewPasswordController;
+use Illuminate\Support\Facades\Mail;
 
 // Role-based redirect route
 Route::get('/', function () {
@@ -93,3 +94,5 @@ Route::resource('order', OrderController::class)->middleware('auth');
 Route::post('infos/{cart}', [OrderController::class, 'verifyInfo'])->middleware('auth')->name('infoBeforeOrder');
 Route::resource('admin/products', ProductController::class)->middleware('auth');
 // Route::resource('users', UserController::class)->middleware('auth');
+
+
