@@ -71,12 +71,12 @@ class dashboardController extends Controller
         $sellerProducts = Product::where('user_id', $user->id);
         
         // Get total sales
-        $totalSales = OrderItem::whereHas('items.product', function($query) use ($user) {
+        $totalSales = OrderItem::whereHas('product', function($query) use ($user) {
             $query->where('user_id', $user->id);
         })->sum('price');
         
         // Get active orders
-        $activeOrders = OrderItem::whereHas('items.product', function($query) use ($user) {
+        $activeOrders = OrderItem::whereHas('product', function($query) use ($user) {
             $query->where('user_id', $user->id);
         })->where(function($query) {
             $query->where('status', 'pending')->orWhere('status', 'processing');
@@ -86,13 +86,13 @@ class dashboardController extends Controller
         $lowStockProducts = $sellerProducts->where('stock', '<', 10)->count();
         
         // Calculate monthly growth
-        $lastMonthSales = OrderItem::whereHas('items.product', function($query) use ($user) {
+        $lastMonthSales = OrderItem::whereHas('product', function($query) use ($user) {
             $query->where('user_id', $user->id);
         })->whereMonth('created_at', now()->subMonth()->month)
           ->whereYear('created_at', now()->subMonth()->year)
           ->sum('price');
           
-        $currentMonthSales = OrderItem::whereHas('items.product', function($query) use ($user) {
+        $currentMonthSales = OrderItem::whereHas('product', function($query) use ($user) {
             $query->where('user_id', $user->id);
         })->whereMonth('created_at', now()->month)
           ->whereYear('created_at', now()->year)
@@ -100,11 +100,11 @@ class dashboardController extends Controller
           
         $salesGrowth = $lastMonthSales > 0 ? (($currentMonthSales - $lastMonthSales) / $lastMonthSales) * 100 : 0;
         
-        $newOrdersToday = OrderItem::whereHas('items.product', function($query) use ($user) {
+        $newOrdersToday = OrderItem::whereHas('product', function($query) use ($user) {
             $query->where('user_id', $user->id);
         })->whereDate('created_at', today())->count();
         
-        $pendingOrders = OrderItem::whereHas('items.product', function($query) use ($user) {
+        $pendingOrders = OrderItem::whereHas('product', function($query) use ($user) {
             $query->where('user_id', $user->id);
         })->where('status', 'pending')->count();
         
@@ -117,7 +117,7 @@ class dashboardController extends Controller
             'new_orders_today' => $newOrdersToday,
             'pending_orders' => $pendingOrders,
             'low_stock_items' => $lowStockProducts,
-            'recent_orders' => OrderItem::whereHas('items.product', function($query) use ($user) {
+            'recent_orders' => OrderItem::whereHas('product', function($query) use ($user) {
                 $query->where('user_id', $user->id);
             })->with('order.user')->latest()->take(5)->get(),
             'role' => 'seller'

@@ -16,11 +16,23 @@
                     @if(request()->has('search'))
                         <span class="text-sm text-vortexGreen">Showing results for "{{ request('search') }}"</span>
                     @endif
+                    @if(request()->has('filter') || request()->has('sort'))
+                        <a href="{{ route('home') . (request()->has('search') ? '?search=' . request('search') : '') }}" 
+                           class="text-sm text-gray-400 hover:text-neon transition-colors duration-300">
+                            Clear filters
+                        </a>
+                    @endif
                 </div>
             </div>
 
             <div class="w-full lg:w-[400px]">
                 <form method="GET" action="{{ route('home') }}" class="relative">
+                    @if(request()->has('filter'))
+                        <input type="hidden" name="filter" value="{{ request('filter') }}">
+                    @endif
+                    @if(request()->has('sort'))
+                        <input type="hidden" name="sort" value="{{ request('sort') }}">
+                    @endif
                     <input type="text"
                            name="search"
                            value="{{ request('search') }}"
@@ -36,27 +48,68 @@
         <!-- Filters and Sort -->
         <div class="mt-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div class="flex flex-wrap gap-2">
-                <button class="px-4 py-2 bg-neon/10 border border-neon/30 text-neon text-sm font-medium rounded-sm hover:bg-neon/20 transition-all duration-300">
-                    All Products
-                </button>
-                <button class="px-4 py-2 bg-transparent border border-gray-700 text-gray-400 text-sm font-medium rounded-sm hover:border-neon hover:text-neon transition-all duration-300">
-                    In Stock
-                </button>
-                <button class="px-4 py-2 bg-transparent border border-gray-700 text-gray-400 text-sm font-medium rounded-sm hover:border-neon hover:text-neon transition-all duration-300">
-                    On Sale
-                </button>
+                <form method="GET" action="{{ route('home') }}" class="contents">
+                    @if(request()->has('search'))
+                        <input type="hidden" name="search" value="{{ request('search') }}">
+                    @endif
+                    @if(request()->has('sort'))
+                        <input type="hidden" name="sort" value="{{ request('sort') }}">
+                    @endif
+                    <button type="submit" name="filter" value="" 
+                            class="px-4 py-2 {{ !request()->has('filter') || request('filter') == '' ? 'bg-neon/10 border-neon/30 text-neon' : 'bg-transparent border-gray-700 text-gray-400 hover:border-neon hover:text-neon' }} border text-sm font-medium rounded-sm transition-all duration-300">
+                        All Products
+                    </button>
+                </form>
+                
+                <form method="GET" action="{{ route('home') }}" class="contents">
+                    @if(request()->has('search'))
+                        <input type="hidden" name="search" value="{{ request('search') }}">
+                    @endif
+                    @if(request()->has('sort'))
+                        <input type="hidden" name="sort" value="{{ request('sort') }}">
+                    @endif
+                    <button type="submit" name="filter" value="in_stock"
+                            class="px-4 py-2 {{ request('filter') == 'in_stock' ? 'bg-neon/10 border-neon/30 text-neon' : 'bg-transparent border-gray-700 text-gray-400 hover:border-neon hover:text-neon' }} border text-sm font-medium rounded-sm transition-all duration-300">
+                        In Stock
+                    </button>
+                </form>
+                
+                <form method="GET" action="{{ route('home') }}" class="contents">
+                    @if(request()->has('search'))
+                        <input type="hidden" name="search" value="{{ request('search') }}">
+                    @endif
+                    @if(request()->has('sort'))
+                        <input type="hidden" name="sort" value="{{ request('sort') }}">
+                    @endif
+                    <button type="submit" name="filter" value="on_sale"
+                            class="px-4 py-2 {{ request('filter') == 'on_sale' ? 'bg-neon/10 border-neon/30 text-neon' : 'bg-transparent border-gray-700 text-gray-400 hover:border-neon hover:text-neon' }} border text-sm font-medium rounded-sm transition-all duration-300">
+                        On Sale
+                    </button>
+                </form>
             </div>
             
-            <select class="bg-transparent border border-gray-700 text-white px-4 py-2 focus:outline-none focus:border-neon text-sm font-medium rounded-sm">
-                <option>Sort by: Latest</option>
-                <option>Sort by: Price (Low to High)</option>
-                <option>Sort by: Price (High to Low)</option>
-                <option>Sort by: Name (A-Z)</option>
-            </select>
+            <form method="GET" action="{{ route('home') }}" class="contents">
+                @if(request()->has('search'))
+                    <input type="hidden" name="search" value="{{ request('search') }}">
+                @endif
+                @if(request()->has('filter'))
+                    <input type="hidden" name="filter" value="{{ request('filter') }}">
+                @endif
+                <select name="sort" onchange="this.form.submit()" 
+                        class="bg-transparent border border-gray-700 text-white px-4 py-2 focus:outline-none focus:border-neon text-sm font-medium rounded-sm">
+                    <option value="" {{ !request()->has('sort') || request('sort') == '' ? 'selected' : '' }}>Sort by: Latest</option>
+                    <option value="price_low_high" {{ request('sort') == 'price_low_high' ? 'selected' : '' }}>Sort by: Price (Low to High)</option>
+                    <option value="price_high_low" {{ request('sort') == 'price_high_low' ? 'selected' : '' }}>Sort by: Price (High to Low)</option>
+                    <option value="name_az" {{ request('sort') == 'name_az' ? 'selected' : '' }}>Sort by: Name (A-Z)</option>
+                </select>
+            </form>
         </div>
     </section>
-
-    <x-cards :products="$products"/>
+    @if($products->count() > 0)
+        <x-cards :products="$products"/>
+    @else
+        <p class="text-gray-400 text-sm text-center">No products found</p>
+    @endif
 
 
     <section class="bg-black py-20 text-center relative overflow-hidden">

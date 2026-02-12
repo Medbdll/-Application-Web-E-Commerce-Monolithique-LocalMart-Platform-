@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Services\GamingImageService;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Product>
@@ -42,11 +43,12 @@ class ProductFactory extends Factory
 
         $product = fake()->randomElement($products);
         $category = \App\Models\Category::where('name', $product['category'])->first();
+        $gamingImageService = new GamingImageService();
         
         return [
             'name' => $product['name'] . ' ' . fake()->randomElement(['Pro', 'Elite', 'Ultra', 'Max', 'Plus', 'X']),
             'description' => fake()->paragraph(3) . ' Features: ' . fake()->sentence(2) . '. Perfect for gaming enthusiasts and professionals.',
-            'image' => 'products/' . fake()->numberBetween(1, 20) . '.jpg',
+            'image' => $gamingImageService->getProductImage($product['name'], $product['category']),
             'price' => $product['base_price'] + fake()->randomFloat(2, -50, 200),
             'stock' => fake()->numberBetween(5, 100),
             'status' => fake()->randomElement(['active', 'active', 'active', 'inactive']),
