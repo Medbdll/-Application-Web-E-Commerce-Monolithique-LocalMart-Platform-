@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @section('title', 'Orders')
 @section('content')
+
     <div class="mb-8">
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-3xl font-gaming font-bold text-white tracking-wide">Mission Logs <span class="text-gray-600 text-lg font-sans ml-2">/ Orders</span></h2>
@@ -40,7 +41,6 @@
         <button class="px-4 py-1.5 rounded-full bg-black border border-gray-800 text-gray-500 hover:border-gray-600 text-xs font-bold uppercase transition-all">Completed</button>
         <button class="px-4 py-1.5 rounded-full bg-black border border-gray-800 text-gray-500 hover:border-gray-600 text-xs font-bold uppercase transition-all">Cancelled</button>
     </div>
-
     <div class="bg-black border border-gray-900 rounded-2xl overflow-hidden shadow-2xl">
         <table class="w-full text-left">
             <thead>
@@ -56,7 +56,16 @@
             <tbody class="divide-y divide-gray-900 text-sm">
                 
                 @forelse ($orders as $order)
-                
+                @php
+                    $allItemsShipped = $order->items->every(function($item) {
+                        return $item->status === 'shipped' || $item->status === 'delivered';
+                    });
+                    
+                    $hasPendingItems = $order->items->contains(function($item) {
+                        return $item->status === 'pending';
+                    });
+                @endphp
+
                 <tr class="hover:bg-gray-900/30 transition-colors">
                     <td class="px-6 py-4 font-gaming text-[#39FF14] font-bold">#ORD-{{ $order->id }}</td>
                     <td class="px-6 py-4 text-gray-400">{{ $order->created_at->format('F j, Y') }}<br><span class="text-[10px] text-gray-600">{{ $order->created_at->format('h:i A') }}</span></td>
@@ -71,7 +80,20 @@
                         <span class="px-2 py-1 bg-green-900/30 text-green-400 border border-green-900 rounded text-[10px] font-bold uppercase tracking-wide">{{ $order->payment_status }}</span>
                     </td>
                     <td class="px-6 py-4">
-                        <livewire:order-status :order="$order" />
+                        @can('edit status order')
+                            <livewire:order-status :order="$order" />
+                        @else
+
+                            @if($allItemsShipped)
+                                <span class="text-green-400">All items shipped</span>
+                            @elseif($hasPendingItems)
+                                <span class="text-yellow-400">Some items pending</span>
+                            @else
+                                <span class="text-gray-400">Mixed status</span>
+                            @endif
+                            
+                        @endcan
+                        
                     </td>
                     <td class="px-6 py-4 font-gaming font-bold text-lg">${{ number_format($order->total_price ?? 0, 2) }}</td>
                     
@@ -96,13 +118,37 @@
                                                     <span class="text-gray-400 text-xs">📦</span>
                                                 </div>
                                                 <div>
-                                                    <h4 class="text-white font-semibold">{{ $item->product->name ?? 'Unknown Product' }}</h4>
-                                                    <p class="text-gray-500 text-xs">SKU: {{ $item->product->sku ?? 'N/A' }}</p>
+                                                    <h4 class="text-white font-semibold">
+                                                        {{ $item->product->name ?? 'Unknown Product' }}
+                                                        <span class="px-2 py-1 rounded text-xs
+                                                            @switch($item->status)
+                                                                @case('pending')
+                                                                    bg-yellow-900/30 text-yellow-400 border-yellow-900
+                                                                        @break
+                                                                    @case('processing')
+                                                                        bg-blue-900/30 text-blue-400 border-blue-900
+                                                                            @break
+                                                                        @case('shipped')
+                                                                            bg-green-900/30 text-green-400 border-green-900
+                                                                                @break
+                                                                            @case('delivered')
+                                                                                bg-purple-900/30 text-purple-400 border-purple-900
+                                                                                    @break
+                                                                                @case('cancelled')
+                                                                                    bg-red-900/30 text-red-400 border-red-900
+                                                                                        @break
+                                                                                    @default
+                                                                                        bg-gray-900/30 text-gray-400 border-gray-900
+                                                                            @endswitch
+                                                                ">
+                                                                    {{ ucfirst($item->status ?? 'N/A') }}
+                                                                </span>
+                                                    </h4>
+                                                    <p class="text-gray-500 text-xs">Qty: {{ $item->quantity }}</p>
                                                 </div>
                                             </div>
                                             <div class="text-right">
                                                 <p class="text-white font-semibold">${{ number_format($item->price, 2) }}</p>
-                                                <p class="text-gray-500 text-xs">Qty: {{ $item->quantity }}</p>
                                             </div>
                                         </div>
                                     @endforeach
