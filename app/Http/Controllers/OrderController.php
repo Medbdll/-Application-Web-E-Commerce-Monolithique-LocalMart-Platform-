@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\AdminEmail;
+use App\Mail\SellerEmail;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class OrderController extends Controller
 {
@@ -27,18 +31,18 @@ class OrderController extends Controller
         } elseif ($this->isSeller()) {
             // Get order items grouped by order
             $orderItems = OrderItem::where('seller_id', $this->authenticatedUser()->id)
-                ->with(['order.user', 'product'])  
+                ->with(['order.user', 'product'])
                 ->latest()
                 ->get()
                 ->groupBy('order_id');
-            
+
             $orders = [];
             foreach ($orderItems as $orderId => $items) {
                 $order = $items->first()->order;
                 $order->items = $items;
                 $orders[] = $order;
             }
-            
+
             return view('dashboard.orders', compact('orders'));
         } else {
             // Fallback for users without proper roles
@@ -70,7 +74,6 @@ class OrderController extends Controller
                 'total_price' => $total,
                 'address_id' => $addressId,
                 'payment_status' => 'pending',
-                'payment_status' => 'pending',
             ]);
             $cartItems = CartItem::where('cart_id', $cartId)->get();
             foreach ($cartItems as $item) {
@@ -81,8 +84,10 @@ class OrderController extends Controller
                     'price' => $item->price,
                     'seller_id' => $item->product->user_id,
                 ]);
+
                 $item->delete();
             }
+
 
             return redirect()->route('order.index');
         } else {
@@ -128,11 +133,12 @@ class OrderController extends Controller
     {
         $user = auth()->user();
         $address = $user->address;
-        if(!$address){
+        if (!$address) {
             $addressExist = false;
-        }else{
+        } else {
             $addressExist = true;
         }
         return view('client.infoBeforeOrder', compact('cart', 'address', 'user', 'addressExist'));
     }
+
 }

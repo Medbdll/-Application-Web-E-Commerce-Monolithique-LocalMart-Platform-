@@ -72,10 +72,7 @@ Route::middleware(['auth', config('jetstream.auth_session'), 'verified', 'role:a
     Route::post('/dashboard/users/userStatus', [UserController::class, 'userStatus'])->name('users.userStatus');
     Route::post('/dashboard/users/create', [UserController::class, 'store'])->name('users.store');
 });
-// Route::middleware(['auth', config('jetstream.auth_session'), 'verified', 'role:moderator'])->group(function () {
-//     Route::get('/dashboard/users', [UserController::class, 'index'])->name('users');
-//     Route::post('/dashboard/users/userStatus', [UserController::class, 'userStatus'])->name('users.userStatus');
-// });
+
 
 Route::middleware(['auth', config('jetstream.auth_session'), 'verified', 'role:client', 'route.restrictions'])->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
