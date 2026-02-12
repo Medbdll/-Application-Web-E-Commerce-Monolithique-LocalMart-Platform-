@@ -10,10 +10,10 @@
                 @auth
                     @if(auth()->user()->hasRole(['admin', 'seller', 'moderator']))
                         <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard*') ? 'text-vortexGreen border-b-2 border-vortexGreen pb-1' : 'text-gray-400 hover:text-vortexGreen' }} transition duration-300">Dashboard</a>
-                        <a href="{{ route('orders') }}" class="{{ request()->routeIs('orders') ? 'text-vortexGreen border-b-2 border-vortexGreen pb-1' : 'text-gray-400 hover:text-vortexGreen' }} transition duration-300">Orders</a>
+                        <a href="{{ route('order.index') }}" class="{{ request()->routeIs('order.index') ? 'text-vortexGreen border-b-2 border-vortexGreen pb-1' : 'text-gray-400 hover:text-vortexGreen' }} transition duration-300">Orders</a>
                     @endif
                     @if(auth()->user()->hasRole('client'))
-                        <a href="#" class="text-gray-400 hover:text-vortexGreen transition duration-300">Orders</a>
+                        <a href="{{ route('order.index') }}" class="{{ request()->routeIs('order.index') ? 'text-vortexGreen border-b-2 border-vortexGreen pb-1' : 'text-gray-400 hover:text-vortexGreen' }} transition duration-300">Orders</a>
                     @endif
                     <a href="{{ route('profile.edit') }}" class="{{ request()->routeIs('profile*') ? 'text-vortexGreen border-b-2 border-vortexGreen pb-1' : 'text-gray-400 hover:text-vortexGreen' }} transition duration-300">Profile</a>
                 @endauth
@@ -85,10 +85,10 @@
                 @auth
                     @if(auth()->user()->hasRole(['admin', 'seller', 'moderator']))
                         <a href="{{ route('dashboard') }}" class="block py-2 font-display uppercase tracking-wider text-sm {{ request()->routeIs('dashboard*') ? 'text-vortexGreen' : 'text-gray-400' }}">Dashboard</a>
-                        <a href="{{ route('orders') }}" class="block py-2 font-display uppercase tracking-wider text-sm {{ request()->routeIs('orders') ? 'text-vortexGreen' : 'text-gray-400' }}">Orders</a>
+                        <a href="{{ route('order.index') }}" class="block py-2 font-display uppercase tracking-wider text-sm {{ request()->routeIs('order.index') ? 'text-vortexGreen' : 'text-gray-400' }}">Orders</a>
                     @endif
                     @if(auth()->user()->hasRole('client'))
-                        <a href="#" class="block py-2 font-display uppercase tracking-wider text-sm text-gray-400">Orders</a>
+                        <a href="{{ route('order.index') }}" class="block py-2 font-display uppercase tracking-wider text-sm {{ request()->routeIs('order.index') ? 'text-vortexGreen' : 'text-gray-400' }}">Orders</a>
                     @endif
                     <a href="{{ route('profile.edit') }}" class="block py-2 font-display uppercase tracking-wider text-sm {{ request()->routeIs('profile*') ? 'text-vortexGreen' : 'text-gray-400' }}">Profile</a>
                 @endauth

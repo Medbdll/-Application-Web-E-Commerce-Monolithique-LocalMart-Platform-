@@ -5,14 +5,16 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class ProductSeeder extends Seeder
+class CartSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        // Create products for each category
-        \App\Models\Product::factory()->count(20)->create();
+        \App\Models\Cart::factory()
+            ->count(15)
+            ->has(\App\Models\CartItem::factory()->count(fake()->numberBetween(1, 4)), 'items')
+            ->create();
     }
 }

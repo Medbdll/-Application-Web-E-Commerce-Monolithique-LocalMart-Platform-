@@ -17,11 +17,10 @@ class OrderFactory extends Factory
     public function definition(): array
     {
         return [
-            'cart_id' => \App\Models\Cart::inRandomOrder()->first()->id ?? \App\Models\Cart::factory(),
+            'user_id' => \App\Models\User::factory(),
+            'address_id' => \App\Models\Address::inRandomOrder()->first()->id ?? \App\Models\Address::factory(),
             'total_price' => fake()->randomFloat(2, 10, 10000),
             'payment_status' => fake()->randomElement(['pending','paid','failed','refunded','partial_refund']),
-            'status' => fake()->randomElement(['pending','confirmed','processing','shipped','delivered','cancelled','returned']),
-            'user_id' => \App\Models\User::factory(),
         ];
     }
 }
