@@ -50,12 +50,34 @@ class ProfileController extends Controller
             'profile_photo' => ['nullable', 'image', 'max:1024'],
             'current_password' => ['nullable', 'required_with:new_password', 'current_password'],
             'new_password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            'address_line1' => ['nullable', 'string', 'max:255'],
+            'city' => ['nullable', 'string', 'max:100'],
+            'postal_code' => ['nullable', 'string', 'max:20'],
+            'phone' => ['nullable', 'string', 'max:20'],
         ]);
 
         $user->update([
             'name' => $validated['name'],
             'email' => $validated['email'],
         ]);
+
+        // Update address information
+        if ($user->address) {
+            $user->address->update([
+                'address_line1' => $validated['address_line1'],
+                'city' => $validated['city'],
+                'postal_code' => $validated['postal_code'],
+                'phone' => $validated['phone'],
+            ]);
+        } else {
+            // Create new address if user doesn't have one
+            $user->address()->create([
+                'address_line1' => $validated['address_line1'],
+                'city' => $validated['city'],
+                'postal_code' => $validated['postal_code'],
+                'phone' => $validated['phone'],
+            ]);
+        }
 
         if ($request->hasFile('profile_photo')) {
             $user->updateProfilePhoto($request->file('profile_photo'));

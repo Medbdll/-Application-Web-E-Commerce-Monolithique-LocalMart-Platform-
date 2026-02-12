@@ -25,13 +25,13 @@
             }
         }
     </script>
-<main class="container mx-auto px-6 py-12 flex-grow">
+<main class="container mx-auto px-6 py-8 flex-grow">
         
-        <div class="mb-12">
-            <h1 class="font-sci-fi text-4xl md:text-5xl font-bold uppercase mb-2">
+        <div class="mb-8">
+            <h1 class="font-sci-fi text-3xl md:text-4xl font-bold uppercase mb-2">
                 User <span class="text-neon-green">Protocol</span>
             </h1>
-            <p class="text-gray-400">Manage your identity and security settings.</p>
+            <p class="text-gray-400 text-sm">Manage your identity and security settings.</p>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -46,8 +46,8 @@
                             <i class="fa-solid fa-camera text-sm"></i>
                         </button>
                     </div>
-                    <h2 class="font-sci-fi text-xl font-bold">VORTEX_PILOT_01</h2>
-                    <p class="text-gray-500 text-sm mb-4">Member since August 2025</p>
+                    <h2 class="font-sci-fi text-xl font-bold">{{ $user->name }}</h2>
+                    <p class="text-gray-500 text-sm mb-4">Member since {{ $user->created_at->format('M Y') }}</p>
                     <div class="inline-block bg-neon-green/10 border border-neon-green/30 text-neon-green px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">
                         Pro Tier
                     </div>
@@ -73,35 +73,37 @@
                         Personal Information
                     </h3>
 
-                    <form class="space-y-6">
+                    <form action="{{ route('profile.update') }}" method="POST" class="space-y-6">
+                        @csrf
+                        @method('PUT')
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="space-y-2">
                                 <label class="text-xs uppercase tracking-widest text-gray-500 font-bold">Full Name</label>
-                                <input type="text" value="Anas Al-Vortox" class="w-full bg-black border border-gray-800 px-4 py-3 text-white focus:border-neon-green transition outline-none rounded-sm">
+                                <input type="text" name="name" value="{{ $user->name }}" class="w-full bg-black border border-gray-800 px-4 py-3 text-white focus:border-neon-green transition outline-none rounded-sm">
                             </div>
                             <div class="space-y-2">
                                 <label class="text-xs uppercase tracking-widest text-gray-500 font-bold">Email Address</label>
-                                <input type="email" value="pilot01@vortex.ma" class="w-full bg-black border border-gray-800 px-4 py-3 text-white focus:border-neon-green transition outline-none rounded-sm">
+                                <input type="email" name="email" value="{{ $user->email }}" class="w-full bg-black border border-gray-800 px-4 py-3 text-white focus:border-neon-green transition outline-none rounded-sm">
                             </div>
                         </div>
 
                         <div class="space-y-2">
                             <label class="text-xs uppercase tracking-widest text-gray-500 font-bold">Shipping Address</label>
-                            <input type="text" value="Boulevard Prince Sidi Mohammed, Nador" class="w-full bg-black border border-gray-800 px-4 py-3 text-white focus:border-neon-green transition outline-none rounded-sm">
+                            <input type="text" name="address_line1" value="{{ $user->address?->address_line1 ?? '' }}" class="w-full bg-black border border-gray-800 px-4 py-3 text-white focus:border-neon-green transition outline-none rounded-sm">
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
                             <div class="space-y-2">
                                 <label class="text-xs uppercase tracking-widest text-gray-500 font-bold">City</label>
-                                <input type="text" value="Nador" class="w-full bg-black border border-gray-800 px-4 py-3 text-white focus:border-neon-green transition outline-none rounded-sm">
+                                <input type="text" name="city" value="{{ $user->address?->city ?? '' }}" class="w-full bg-black border border-gray-800 px-4 py-3 text-white focus:border-neon-green transition outline-none rounded-sm">
                             </div>
                             <div class="space-y-2">
                                 <label class="text-xs uppercase tracking-widest text-gray-500 font-bold">Zip Code</label>
-                                <input type="text" value="62000" class="w-full bg-black border border-gray-800 px-4 py-3 text-white focus:border-neon-green transition outline-none rounded-sm">
+                                <input type="text" name="postal_code" value="{{ $user->address?->postal_code ?? '' }}" class="w-full bg-black border border-gray-800 px-4 py-3 text-white focus:border-neon-green transition outline-none rounded-sm">
                             </div>
                             <div class="space-y-2">
                                 <label class="text-xs uppercase tracking-widest text-gray-500 font-bold">Phone</label>
-                                <input type="text" value="+212 605593734" class="w-full bg-black border border-gray-800 px-4 py-3 text-white focus:border-neon-green transition outline-none rounded-sm">
+                                <input type="text" name="phone" value="{{ $user->address?->phone ?? '' }}" class="w-full bg-black border border-gray-800 px-4 py-3 text-white focus:border-neon-green transition outline-none rounded-sm">
                             </div>
                         </div>
 

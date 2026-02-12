@@ -17,9 +17,10 @@ class OrderItemFactory extends Factory
     public function definition(): array
     {
         return [
-            'order_id' => \App\Models\Order::inRandomOrder()->first()->id ?? \App\Models\Order::factory(),
-            'product_id' => \App\Models\Product::inRandomOrder()->first()->id ?? \App\Models\Product::factory(),
+            'product_id' => \App\Models\Product::factory(),
             'quantity' => fake()->numberBetween(1, 10),
+            'status' => fake()->randomElement(['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'returned']),
+            'seller_id' => \App\Models\User::factory(),  // Keep it simple for now
             'price' => fake()->randomFloat(2, 10, 1000),
         ];
     }

@@ -12,6 +12,9 @@ class OrderSeeder extends Seeder
      */
     public function run(): void
     {
-        \App\Models\Order::factory()->count(5)->create();
+        \App\Models\Order::factory()
+            ->count(5)
+            ->has(\App\Models\OrderItem::factory()->count(fake()->numberBetween(1, 5)), 'items')
+            ->create();
     }
 }

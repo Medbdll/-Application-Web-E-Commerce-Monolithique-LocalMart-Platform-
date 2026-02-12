@@ -5,7 +5,6 @@
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-3xl font-gaming font-bold text-white tracking-wide">Mission Logs <span class="text-gray-600 text-lg font-sans ml-2">/ Orders</span></h2>
             <div class="flex gap-2">
-                <button class="px-4 py-2 bg-gray-900 border border-gray-800 text-gray-400 rounded-lg text-sm hover:text-white hover:border-gray-600 transition-all">Export CSV</button>
                 <button class="px-4 py-2 bg-gray-900 border border-gray-800 text-gray-400 rounded-lg text-sm hover:text-white hover:border-gray-600 transition-all">Print Manifest</button>
             </div>
         </div>
@@ -52,81 +51,111 @@
                     <th class="px-6 py-4">Payment</th>
                     <th class="px-6 py-4">Fulfillment</th>
                     <th class="px-6 py-4">Total</th>
-                    <th class="px-6 py-4 text-right">View</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-900 text-sm">
+                
+                @forelse ($orders as $order)
+                
                 <tr class="hover:bg-gray-900/30 transition-colors">
-                    <td class="px-6 py-4 font-gaming text-[#39FF14] font-bold">#ORD-9923</td>
-                    <td class="px-6 py-4 text-gray-400">Oct 24, 2024<br><span class="text-[10px] text-gray-600">10:42 AM</span></td>
+                    <td class="px-6 py-4 font-gaming text-[#39FF14] font-bold">#ORD-{{ $order->id }}</td>
+                    <td class="px-6 py-4 text-gray-400">{{ $order->created_at->format('F j, Y') }}<br><span class="text-[10px] text-gray-600">{{ $order->created_at->format('h:i A') }}</span></td>
                     <td class="px-6 py-4">
                         <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-xs font-bold">JD</div>
-                            <span class="text-gray-200">John Doe</span>
+                            {{-- <img src="https://ui-avatars.com/api/?name={{ $order->user->name }}&background=222&color=fff" class="w-8 h-8 rounded-full" alt=""> --}}
+                            <span class="text-gray-200">{{ $order->user?->name ?? 'Unknown User' }}</span>
                         </div>
                     </td>
+                    
                     <td class="px-6 py-4">
-                        <span class="px-2 py-1 bg-green-900/30 text-green-400 border border-green-900 rounded text-[10px] font-bold uppercase tracking-wide">PAID</span>
+                        <span class="px-2 py-1 bg-green-900/30 text-green-400 border border-green-900 rounded text-[10px] font-bold uppercase tracking-wide">{{ $order->payment_status }}</span>
                     </td>
                     <td class="px-6 py-4">
-                        <span class="px-2 py-1 bg-yellow-900/30 text-yellow-500 border border-yellow-900 rounded text-[10px] font-bold uppercase tracking-wide flex w-fit items-center gap-1">
-                            <span class="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse"></span> Processing
-                        </span>
+                        <livewire:order-status :order="$order" />
                     </td>
-                    <td class="px-6 py-4 font-gaming font-bold text-lg">$1,299.00</td>
-                    <td class="px-6 py-4 text-right">
-                        <button class="text-gray-500 hover:text-white transition-colors">
-                            <svg class="w-5 h-5 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                        </button>
+                    <td class="px-6 py-4 font-gaming font-bold text-lg">${{ number_format($order->total_price ?? 0, 2) }}</td>
+                    
+                </tr>
+                
+                <!-- Order Items Row -->
+                <tr class="bg-gray-900/20">
+                    <td colspan="6" class="px-6 py-0">
+                        <div class="overflow-hidden">
+                            <button onclick="toggleOrderItems({{ $order->id }})" class="w-full px-6 py-3 text-left text-xs text-gray-500 hover:text-gray-300 transition-colors flex items-center justify-between">
+                                <span class="font-bold uppercase">View Items ({{ $order->items->count() }})</span>
+                                <svg id="arrow-{{ $order->id }}" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+                            <div id="items-{{ $order->id }}" class="hidden border-t border-gray-800">
+                                <div class="p-6 space-y-4">
+                                    @foreach($order->items as $item)
+                                        <div class="flex items-center justify-between bg-black/50 rounded-lg p-4 border border-gray-800">
+                                            <div class="flex items-center gap-4">
+                                                <div class="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center">
+                                                    <span class="text-gray-400 text-xs">📦</span>
+                                                </div>
+                                                <div>
+                                                    <h4 class="text-white font-semibold">{{ $item->product->name ?? 'Unknown Product' }}</h4>
+                                                    <p class="text-gray-500 text-xs">SKU: {{ $item->product->sku ?? 'N/A' }}</p>
+                                                </div>
+                                            </div>
+                                            <div class="text-right">
+                                                <p class="text-white font-semibold">${{ number_format($item->price, 2) }}</p>
+                                                <p class="text-gray-500 text-xs">Qty: {{ $item->quantity }}</p>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
                     </td>
                 </tr>
 
-                <tr class="hover:bg-gray-900/30 transition-colors">
-                    <td class="px-6 py-4 font-gaming text-[#39FF14] font-bold">#ORD-9922</td>
-                    <td class="px-6 py-4 text-gray-400">Oct 23, 2024<br><span class="text-[10px] text-gray-600">04:15 PM</span></td>
-                    <td class="px-6 py-4">
-                        <div class="flex items-center gap-3">
-                            <img src="https://ui-avatars.com/api/?name=Sarah+Connor&background=222&color=fff" class="w-8 h-8 rounded-full" alt="">
-                            <span class="text-gray-200">Sarah Connor</span>
+                @empty
+                <tr>
+                    <td colspan="6" class="px-6 py-12 text-center">
+                        <div class="text-gray-500">
+                            <div class="text-4xl mb-4">📦</div>
+                            <h3 class="text-lg font-semibold text-white mb-2">No orders found</h3>
+                            <p class="text-sm">You don't have any orders to manage yet.</p>
                         </div>
                     </td>
-                    <td class="px-6 py-4">
-                        <span class="px-2 py-1 bg-green-900/30 text-green-400 border border-green-900 rounded text-[10px] font-bold uppercase tracking-wide">PAID</span>
-                    </td>
-                    <td class="px-6 py-4">
-                        <span class="px-2 py-1 bg-[#39FF14]/10 text-[#39FF14] border border-[#39FF14]/30 rounded text-[10px] font-bold uppercase tracking-wide">Delivered</span>
-                    </td>
-                    <td class="px-6 py-4 font-gaming font-bold text-lg">$89.50</td>
-                    <td class="px-6 py-4 text-right">
-                        <button class="text-gray-500 hover:text-white transition-colors">
-                            <svg class="w-5 h-5 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                        </button>
-                    </td>
                 </tr>
-
-                <tr class="hover:bg-gray-900/30 transition-colors opacity-60">
-                    <td class="px-6 py-4 font-gaming text-gray-500 font-bold">#ORD-9921</td>
-                    <td class="px-6 py-4 text-gray-500">Oct 22, 2024<br><span class="text-[10px] text-gray-700">09:00 AM</span></td>
-                    <td class="px-6 py-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-xs font-bold text-gray-500">AN</div>
-                            <span class="text-gray-500 line-through">Anon User</span>
-                        </div>
-                    </td>
-                    <td class="px-6 py-4">
-                        <span class="px-2 py-1 bg-red-900/30 text-red-500 border border-red-900 rounded text-[10px] font-bold uppercase tracking-wide">FAILED</span>
-                    </td>
-                    <td class="px-6 py-4">
-                        <span class="px-2 py-1 bg-gray-800 text-gray-400 border border-gray-700 rounded text-[10px] font-bold uppercase tracking-wide">Cancelled</span>
-                    </td>
-                    <td class="px-6 py-4 font-gaming font-bold text-lg text-gray-500">$2,400.00</td>
-                    <td class="px-6 py-4 text-right">
-                        <button class="text-gray-600 hover:text-white transition-colors">
-                            <svg class="w-5 h-5 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                        </button>
-                    </td>
-                </tr>
+            @endforelse
             </tbody>
         </table>
     </div>
     @endsection
+
+<script>
+
+function toggleOrderItems(orderId) {
+    const itemsDiv = document.getElementById(`items-${orderId}`);
+    const arrow = document.getElementById(`arrow-${orderId}`);
+    
+    if (itemsDiv.classList.contains('hidden')) {
+        itemsDiv.classList.remove('hidden');
+        arrow.classList.add('rotate-180');
+    } else {
+        itemsDiv.classList.add('hidden');
+        arrow.classList.remove('rotate-180');
+    }
+}
+
+function showNotification(message, type) {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg font-sci-fi text-sm uppercase tracking-wider z-50 ${
+        type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
+    }`;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+</script>

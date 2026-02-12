@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cart;
+use App\Models\CartItem;
 use App\Models\Order;
+use App\Models\OrderItem;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -14,13 +16,34 @@ class OrderController extends Controller
     public function index()
     {
         if ($this->isAdmin()) {
-            $orders = Order::all();
+            $orders = Order::with(['user', 'items.product'])->latest()->get();
+            return view('dashboard.orders', compact('orders'));
+        } elseif ($this->isClient()) {
+            $orders = Order::where('user_id', $this->authenticatedUser()->id)
+                ->with(['items.product'])
+                ->latest()
+                ->get();
+            return view('client.orders', compact('orders'));
+        } elseif ($this->isSeller()) {
+            // Get order items grouped by order
+            $orderItems = OrderItem::where('seller_id', $this->authenticatedUser()->id)
+                ->with(['order.user', 'product'])  
+                ->latest()
+                ->get()
+                ->groupBy('order_id');
+            
+            $orders = [];
+            foreach ($orderItems as $orderId => $items) {
+                $order = $items->first()->order;
+                $order->items = $items;
+                $orders[] = $order;
+            }
+            
+            return view('dashboard.orders', compact('orders'));
         } else {
-            $orders = Order::where('user_id', $this->authenticatedUser()->id)->get();
+            // Fallback for users without proper roles
+            abort(403, 'Unauthorized access');
         }
-
-        return $orders;
-
     }
 
     /**
@@ -34,19 +57,34 @@ class OrderController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Cart $cart)
+    public function store(Request $request)
     {
         if ($this->authenticatedUser()->hasRole('client')) {
-            if (auth()->user()->address) {
-                $order = Order::create([
-                    'user_id' => $this->authenticatedUser()->id,
-                    'cart_id' => $cart->id,
-                    'total' => $cart->total,
+
+            $total = $request->total;
+            $cartId = $request->cart_id;
+            $addressId = $request->address_id;
+            $order = Order::create([
+                'user_id' => $this->authenticatedUser()->id,
+                'cart_id' => $cartId,
+                'total_price' => $total,
+                'address_id' => $addressId,
+                'payment_status' => 'pending',
+                'payment_status' => 'pending',
+            ]);
+            $cartItems = CartItem::where('cart_id', $cartId)->get();
+            foreach ($cartItems as $item) {
+                $order->items()->create([
+                    'order_id' => $order->id,
+                    'product_id' => $item->product_id,
+                    'quantity' => $item->quantity,
+                    'price' => $item->price,
+                    'seller_id' => $item->product->user_id,
                 ]);
-                return redirect()->route('orders.show', $order);
-            } else {
-                return redirect()->route('address.add');
+                $item->delete();
             }
+
+            return redirect()->route('order.index');
         } else {
             abort(403);
         }
@@ -86,9 +124,15 @@ class OrderController extends Controller
         //
     }
 
-    public function verifyInfo(Cart $cart) {
+    public function verifyInfo(Cart $cart)
+    {
         $user = auth()->user();
         $address = $user->address;
-        return view('client.infoBeforeOrder', compact('cart','address', 'user'));
+        if(!$address){
+            $addressExist = false;
+        }else{
+            $addressExist = true;
+        }
+        return view('client.infoBeforeOrder', compact('cart', 'address', 'user', 'addressExist'));
     }
 }
