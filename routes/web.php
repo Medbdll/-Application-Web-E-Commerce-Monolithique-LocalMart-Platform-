@@ -14,7 +14,15 @@ use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Fortify\Http\Controllers\RegisteredUserController;
 use Laravel\Fortify\Http\Controllers\PasswordResetLinkController;
 use Laravel\Fortify\Http\Controllers\NewPasswordController;
+//stripe
+use App\Http\Controllers\CheckoutController;
 
+Route::post('/checkout/{order}', [CheckoutController::class, 'checkout'])->name('checkout');
+// The page the user lands on after a successful payment
+Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
+
+// The page the user lands on if they click "Back" or cancel on the Stripe page
+Route::get('/checkout/cancel', [CheckoutController::class, 'cancel'])->name('checkout.cancel');
 // Role-based redirect route
 Route::get('/', function () {
     if(Auth::check() && Auth::user()->hasRole(['admin', 'seller','moderator'])) {

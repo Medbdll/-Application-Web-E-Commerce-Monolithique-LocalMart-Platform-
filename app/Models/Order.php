@@ -16,7 +16,8 @@ class Order extends Model
         'cart_id',
         'address_id',
         'status',
-        'payment_status'
+        'payment_status',
+        'stripe_session_id'
 
     ];
 

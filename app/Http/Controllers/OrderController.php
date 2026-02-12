@@ -7,6 +7,8 @@ use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -18,23 +20,27 @@ class OrderController extends Controller
         if ($this->isAdmin()) {
 
             $orders = Order::with(['user', 'items.product'])->latest()->get();
+
             return view('dashboard.orders', compact('orders'));
 
         } elseif ($this->isSeller()) {
 
             $orderItems = OrderItem::where('seller_id', $this->authenticatedUser()->id)
-                ->with(['order.user', 'product'])  
+                ->with(['order.user', 'product'])
                 ->latest()
                 ->get()
                 ->groupBy('order_id');
-            
+
             $orders = [];
             foreach ($orderItems as $orderId => $items) {
                 $order = $items->first()->order;
                 $order->items = $items;
                 $orders[] = $order;
             }
-            
+
+            // Filter seller orders to show only paid orders
+            $orders = collect($orders)->where('payment_status', 'paid');
+
             return view('dashboard.orders', compact('orders'));
         } elseif ($this->isClient()) {
 
@@ -42,6 +48,7 @@ class OrderController extends Controller
                 ->with(['items.product'])
                 ->latest()
                 ->get();
+
             return view('client.orders', compact('orders'));
 
         } else {
@@ -67,16 +74,22 @@ class OrderController extends Controller
             $total = $request->total;
             $cartId = $request->cart_id;
             $addressId = $request->address_id;
+            $userId = $this->authenticatedUser()->id;
             $order = Order::create([
-                'user_id' => $this->authenticatedUser()->id,
+                'user_id' => $userId,
                 'cart_id' => $cartId,
                 'total_price' => $total,
                 'address_id' => $addressId,
-                'payment_status' => 'pending',
-                'payment_status' => 'pending',
             ]);
-            $cartItems = CartItem::where('cart_id', $cartId)->get();
+            $cartItems = CartItem::with('product')->where('cart_id', $cartId)->get();
             foreach ($cartItems as $item) {
+                // Skip items without valid products
+                if (!$item->product) {
+                    Log::warning('Skipping cart item ' . $item->id . ' - product not found');
+                    $item->delete();
+                    continue;
+                }
+                
                 $order->items()->create([
                     'order_id' => $order->id,
                     'product_id' => $item->product_id,
@@ -131,11 +144,12 @@ class OrderController extends Controller
     {
         $user = auth()->user();
         $address = $user->address;
-        if(!$address){
+        if (! $address) {
             $addressExist = false;
-        }else{
+        } else {
             $addressExist = true;
         }
+
         return view('client.infoBeforeOrder', compact('cart', 'address', 'user', 'addressExist'));
     }
 }

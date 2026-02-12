@@ -141,10 +141,14 @@
                                     </button>
                                 @endif
                             @elseif ($order->payment_status === 'pending')
-                                <button
+                                <form action="{{ route('checkout', $order) }}" method="POST">
+                                    @csrf
+                                    <button
                                     class="w-full md:w-64 bg-neon-green text-black px-6 py-3 font-sci-fi text-sm uppercase font-bold hover:bg-neon-green/80 transition-all">
                                     Pay Now
                                 </button>
+                                </form>
+                                
                             @endif
                         </div>
                     </div>
