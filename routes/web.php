@@ -60,17 +60,21 @@ Route::middleware(['auth', config('jetstream.auth_session'), 'verified', 'role:c
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::middleware(['auth', config('jetstream.auth_session'), 'verified', 'role:admin|seller', 'route.restrictions'])->group(function () {
+Route::middleware(['auth', config('jetstream.auth_session'), 'verified', 'role:admin|seller|moderator', 'route.restrictions'])->group(function () {
     Route::get('/dashboard', [dashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/product', [ProductController::class, 'index'])->name('product');
+});
+Route::middleware(['auth', config('jetstream.auth_session'), 'verified', 'role:admin|seller', 'route.restrictions'])->group(function () {
     Route::get('/dashboard/orders', [OrderController::class, 'index'])->name('orders');
-   });
+});
 
 Route::middleware(['auth', config('jetstream.auth_session'), 'verified', 'role:admin', 'route.restrictions'])->group(function () {
-    Route::get('/dashboard/users', [UserController::class, 'index'])->name('users');
     Route::get('/dashboard/users/update/{id}', [UserController::class, 'update'])->name('users.update');
-    Route::post('/dashboard/users/userStatus', [UserController::class, 'userStatus'])->name('users.userStatus');
     Route::post('/dashboard/users/create', [UserController::class, 'store'])->name('users.store');
+});
+Route::middleware(['auth', config('jetstream.auth_session'), 'verified', 'role:admin|moderator', 'route.restrictions'])->group(function () {
+    Route::get('/dashboard/users', [UserController::class, 'index'])->name('users');
+    Route::post('/dashboard/users/userStatus', [UserController::class, 'userStatus'])->name('users.userStatus');
 });
 
 
@@ -92,5 +96,3 @@ Route::resource('order', OrderController::class)->middleware(['auth', 'route.res
 Route::post('infos/{cart}', [OrderController::class, 'verifyInfo'])->middleware(['auth', 'route.restrictions'])->name('infoBeforeOrder');
 Route::resource('admin/products', ProductController::class)->middleware(['auth', 'route.restrictions']);
 // Route::resource('users', UserController::class)->middleware('auth');
-
-

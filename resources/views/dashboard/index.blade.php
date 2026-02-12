@@ -4,7 +4,8 @@
 
 
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6 mb-10">
+        @if($statistics['role'] !== 'moderator')
         <div class="bg-black p-6 rounded-2xl border border-gray-900 hover:border-[#39FF14]/50 transition-all group">
             <div class="flex justify-between items-start">
                 <div>
@@ -51,14 +52,15 @@
                 {{ $statistics['pending_verification'] ?? $statistics['pending_orders'] ?? '0' }} Pending verification
             </p>
         </div>
+        @endif
         <div class="bg-black p-6 rounded-2xl border border-gray-900 hover:border-[#39FF14]/50 transition-all group">
             <div class="flex justify-between items-start">
                 <div>
                     <p class="text-gray-500 text-sm font-semibold uppercase">
-                        {{ $statistics['role'] === 'seller' ? 'My Products' : ($statistics['role'] === 'moderator' ? 'Active Users' : 'Total Users') }}
+                        {{ $statistics['role'] === 'seller' ? 'My Products' : ($statistics['role'] === 'moderator' ? 'Suspended Users' : 'Total Users') }}
                     </p>
                     <h3 class="text-3xl font-gaming font-bold mt-1">
-                        {{ $statistics['total_products'] ?? $statistics['active_users'] ?? $statistics['total_users'] ?? '0' }}
+                        {{ $statistics['role'] === 'moderator' ? ($statistics['suspended_users'] ?? '0') : ($statistics['total_products'] ?? $statistics['active_users'] ?? $statistics['total_users'] ?? '0') }}
                     </h3>
                 </div>
                 <div class="bg-[#39FF14]/10 p-3 rounded-lg text-[#39FF14] group-hover:neon-glow">
@@ -68,31 +70,50 @@
                     </svg>
                 </div>
             </div>
-            <p class="text-xs text-green-400 mt-4">
-                {{ $statistics['new_users_today'] ?? $statistics['new_orders_today'] ?? '+0' }} New today
+            <p class="text-xs {{ $statistics['role'] === 'moderator' ? 'text-red-500' : 'text-green-400' }} mt-4">
+                {{ $statistics['role'] === 'moderator' ? ($statistics['new_suspensions_today'] ?? '+0') . ' Suspended today' : ($statistics['new_users_today'] ?? $statistics['new_orders_today'] ?? '+0') . ' New today' }}
             </p>
         </div>
         <div class="bg-black p-6 rounded-2xl border border-gray-900 hover:border-[#39FF14]/50 transition-all group">
             <div class="flex justify-between items-start">
                 <div>
                     <p class="text-gray-500 text-sm font-semibold uppercase">
-                        {{ $statistics['role'] === 'moderator' ? 'Pending Reviews' : 'Stock Level' }}
+                        {{ $statistics['role'] === 'moderator' ? 'Suspended Products' : 'Stock Level' }}
                     </p>
                     <h3 class="text-3xl font-gaming font-bold mt-1">
-                        {{ $statistics['role'] === 'moderator' ? ($statistics['pending_reviews'] ?? '0') : ($statistics['stock_level'] ?? '0') . '%' }}
+                        {{ $statistics['role'] === 'moderator' ? ($statistics['suspended_products'] ?? '0') : ($statistics['stock_level'] ?? '0') . '%' }}
                     </h3>
                 </div>
                 <div class="bg-[#39FF14]/10 p-3 rounded-lg text-[#39FF14] group-hover:neon-glow">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                              d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                     </svg>
                 </div>
             </div>
-            <p class="text-xs {{ $statistics['low_stock_items'] > 0 ? 'text-red-500' : 'text-green-400' }} mt-4">
-                {{ $statistics['role'] === 'moderator' ? ($statistics['reported_products'] ?? '0') . ' Reported products' : ($statistics['low_stock_items'] ?? '0') . ' Items low in stock' }}
+            <p class="text-xs {{ $statistics['role'] === 'moderator' ? 'text-red-500' : ($statistics['low_stock_items'] > 0 ? 'text-red-500' : 'text-green-400') }} mt-4">
+                {{ $statistics['role'] === 'moderator' ? ($statistics['new_suspended_products_today'] ?? '+0') . ' Suspended today' : ($statistics['low_stock_items'] ?? '0') . ' Items low in stock' }}
             </p>
         </div>
+        @if($statistics['role'] === 'moderator')
+        <div class="bg-black p-6 rounded-2xl border border-gray-900 hover:border-[#39FF14]/50 transition-all group">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-gray-500 text-sm font-semibold uppercase">Pending Reviews</p>
+                    <h3 class="text-3xl font-gaming font-bold mt-1">{{ $statistics['pending_reviews'] ?? '0' }}</h3>
+                </div>
+                <div class="bg-[#39FF14]/10 p-3 rounded-lg text-[#39FF14] group-hover:neon-glow">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                    </svg>
+                </div>
+            </div>
+            <p class="text-xs text-yellow-500 mt-4">
+                {{ $statistics['new_reviews_today'] ?? '+0' }} New today
+            </p>
+        </div>
+        @endif
     </div>
 
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
@@ -157,42 +178,11 @@
             </div>
         </div>
 
-        <div class="bg-black border border-gray-900 rounded-3xl p-6">
-            <h2 class="text-xl font-gaming font-bold mb-6 tracking-wide flex items-center gap-2">
-                <span class="w-2 h-2 bg-[#39FF14] rounded-full animate-pulse"></span>
-                Live Feed
-            </h2>
-            <div class="space-y-6">
-                <div class="flex gap-4">
-                    <div class="bg-blue-500/20 p-2 rounded-lg h-fit text-blue-500">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 4v16m8-8H4"></path>
-                        </svg>
-                    </div>
-                    <div>
-                        <p class="text-sm font-bold">New inventory added</p>
-                        <p class="text-xs text-gray-500">Vortex Mouse V3 Pro (x50)</p>
-                        <span class="text-[10px] text-gray-600">2 min ago</span>
-                    </div>
-                </div>
-                <div class="flex gap-4">
-                    <div class="bg-red-500/20 p-2 rounded-lg h-fit text-red-500">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path
-                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                        </svg>
-                    </div>
-                    <div>
-                        <p class="text-sm font-bold">Security Alert</p>
-                        <p class="text-xs text-gray-500">Failed login from 192.168.1.1</p>
-                        <span class="text-[10px] text-gray-600">14 min ago</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+       
 
     </div>
-
+    @role('admin')
     <livewire:category-table/>
+    @endrole
 
 @endsection
