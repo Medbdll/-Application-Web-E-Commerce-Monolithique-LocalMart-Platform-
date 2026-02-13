@@ -16,7 +16,11 @@
             <div class="space-y-4">
                 <div class="aspect-[4/3] bg-card-bg border border-gray-800 flex items-center justify-center relative overflow-hidden group">
                     <div class="absolute top-0 left-0 w-6 h-6 border-t border-l border-vortexGreen/50"></div>
-                    <span class="text-gray-700 font-sci-fi text-lg tracking-[0.3em] uppercase opacity-50">Product_Visual</span>
+                    @if($product->image)
+                        <img src="{{ $product->image }}" alt="{{ $product->name }}" class="max-h-full max-w-full object-contain">
+                    @else
+                        <span class="text-gray-700 font-sci-fi text-lg tracking-[0.3em] uppercase opacity-50">Product_Visual</span>
+                    @endif
                 </div>
                 
                 <div class="grid grid-cols-4 gap-4">

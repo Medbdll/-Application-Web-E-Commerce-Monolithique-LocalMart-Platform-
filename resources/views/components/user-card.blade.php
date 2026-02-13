@@ -22,6 +22,7 @@
             </div>
         </div>
     </td>
+    @role('admin')
     <td class="p-5">
 
         <form action="{{ route('users.update', $user->id) }}" class="space-y-3" id="user-role-form-{{ $user->id }}">
@@ -49,6 +50,7 @@
         </form>
 
     </td>
+    @endrole
     <td class="p-5">
         <div class="flex items-center gap-2">
             <span

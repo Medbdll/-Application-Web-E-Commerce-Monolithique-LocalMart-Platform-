@@ -28,6 +28,14 @@ class CreateNewUser implements CreatesNewUsers
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
         ])->validate();
 
+        // Check if user with this email was previously banned
+        $bannedUser = User::withTrashed()->where('email', $input['email'])->where('status', 'banned')->first();
+        if ($bannedUser) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'email' => ['This email address has been banned from the platform.'],
+            ]);
+        }
+
         return DB::transaction(function () use ($input) {
             return tap(User::create([
                 'name' => $input['name'],
@@ -44,6 +52,10 @@ class CreateNewUser implements CreatesNewUsers
      */
     protected function createTeam(User $user): void
     {
+        if (!$user || !$user->id) {
+            throw new \Exception('Unable to create team: Invalid user data');
+        }
+        
         $user->ownedTeams()->save(Team::forceCreate([
             'user_id' => $user->id,
             'name' => explode(' ', $user->name, 2)[0]."'s Team",

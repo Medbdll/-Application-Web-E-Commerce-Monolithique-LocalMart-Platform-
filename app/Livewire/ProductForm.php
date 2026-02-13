@@ -2,6 +2,10 @@
 
 namespace App\Livewire;
 
+use App\Mail\AdminEmail;
+use App\Mail\SellerEmail;
+use App\Models\User;
+use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 use App\Models\Product;
 use App\Models\Category;
@@ -10,7 +14,7 @@ use Livewire\WithFileUploads;
 class ProductForm extends Component
 {
     use WithFileUploads;
-    
+
     public $productId = null;
     public $name = '';
     public $description = '';
@@ -24,6 +28,11 @@ class ProductForm extends Component
 
     public function save()
     {
+        if (!auth()->check()) {
+            $this->dispatch('error', 'You must be logged in to perform this action');
+            return;
+        }
+
         $validated = $this->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
@@ -45,7 +54,18 @@ class ProductForm extends Component
         if ($this->productId) {
             Product::find($this->productId)->update($validated);
         } else {
-            Product::create($validated);
+            $product = Product::create($validated);
+
+            $adminEmails = User::role('admin')->pluck('email');
+            foreach ($adminEmails as $adminEmail) {
+                Mail::to($adminEmail)->queue(new AdminEmail(
+                    auth()->user()->name,
+                    auth()->id(),
+                    $product->name,
+                    $product->id,
+                    $product->created_at->format('Y-m-d H:i'),
+                ));
+            }
         }
 
         $this->reset();
@@ -57,6 +77,11 @@ class ProductForm extends Component
     {
         if ($id) {
             $product = Product::find($id);
+            if (!$product) {
+                $this->dispatch('error', 'Product not found');
+                return;
+            }
+            
             $this->productId = $product->id;
             $this->name = $product->name;
             $this->description = $product->description;

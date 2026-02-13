@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\AdminEmail;
+use App\Mail\SellerEmail;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\User;
 use App\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Mail;
 
 class ProductController extends Controller
 {
@@ -65,10 +69,13 @@ class ProductController extends Controller
 
             $validated['user_id'] = auth()->id();
             $product = Product::create($validated);
+
+
             return response()->json($product, 201);
         } else {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
+
     }
 
     /**
@@ -77,6 +84,10 @@ class ProductController extends Controller
     public function show(Product $product)
     {
         $user = auth()->user();
+        if (!$user) {
+            return redirect()->route('login');
+        }
+        
         $cart = $user->cart;
         
         // Check if cart exists before trying to access it

@@ -15,18 +15,14 @@ class CategoryForm extends Component
 
     protected $listeners = [
         'openCategoryModal' => 'openModal',
-        'editCategory' => 'loadCategory',
-        'categorySaved' => '$refresh'
+        'editCategory' => 'loadCategory'
     ];
 
-    protected function rules()
-    {
-        return [
-            'name' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:categories,slug,' . $this->categoryId,
-            'description' => 'nullable|string',
-        ];
-    }
+    protected $rules = [
+        'name' => 'required|string|max:255',
+        'slug' => 'required|string|max:255|unique:categories,slug',
+        'description' => 'nullable|string',
+    ];
 
     public function openModal()
     {
@@ -36,7 +32,12 @@ class CategoryForm extends Component
 
     public function loadCategory($id)
     {
-        $category = Category::findOrFail($id);
+        $category = Category::find($id);
+        if (!$category) {
+            $this->dispatch('error', 'Category not found');
+            return;
+        }
+        
         $this->categoryId = $category->id;
         $this->name = $category->name;
         $this->slug = $category->slug;
@@ -59,7 +60,11 @@ class CategoryForm extends Component
 
     public function save()
     {
-        $this->validate();
+        $this->validate([
+            'name' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:categories,slug,' . $this->categoryId,
+            'description' => 'nullable|string',
+        ]);
 
         Category::updateOrCreate(
             ['id' => $this->categoryId],
