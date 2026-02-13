@@ -122,8 +122,8 @@
                 <h2 class="text-xl font-gaming font-bold tracking-wide">
                     {{ $statistics['role'] === 'seller' ? 'My Recent Orders' : 'Recent Acquisitions' }}
                 </h2>
-                <button class="text-[#39FF14] text-sm hover:underline">View All</button>
             </div>
+            {{-- @role('admin') --}}
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
                     <thead>
@@ -132,7 +132,6 @@
                         <th class="px-6 py-4">Customer</th>
                         <th class="px-6 py-4">Total</th>
                         <th class="px-6 py-4">Status</th>
-                        <th class="px-6 py-4">Actions</th>
                     </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-900">
@@ -142,12 +141,12 @@
                         <td class="px-6 py-4">
                             <div class="flex items-center gap-3">
                                 <div class="w-8 h-8 rounded-lg bg-gray-800 flex items-center justify-center text-xs">
-                                    {{ strtoupper(substr($order->user->name ?? 'UN', 0, 2)) }}
+                                    {{ strtoupper(substr($order->order->user->name ?? 'UN', 0, 2)) }}
                                 </div>
-                                <span>{{ $order->user->name ?? 'Unknown' }}</span>
+                                <span>{{ $order->order->user->name }}</span>
                             </div>
                         </td>
-                        <td class="px-6 py-4 font-bold">${{ number_format($order->total_price, 2) }}</td>
+                        <td class="px-6 py-4 font-bold">${{ number_format($order->price, 2) }}</td>
                         <td class="px-6 py-4">
                             <span class="px-3 py-1 
                                 {{ $order->status === 'shipped' ? 'bg-green-500/10 text-green-500 border-green-500/20' : 
@@ -156,14 +155,6 @@
                                 rounded-full text-[10px] font-bold border">
                                 {{ strtoupper($order->status) }}
                             </span>
-                        </td>
-                        <td class="px-6 py-4">
-                            <button class="text-gray-400 hover:text-white">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                    <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                </svg>
-                            </button>
                         </td>
                     </tr>
                     @empty
@@ -176,6 +167,7 @@
                     </tbody>
                 </table>
             </div>
+            {{-- @endrole --}}
         </div>
 
        
