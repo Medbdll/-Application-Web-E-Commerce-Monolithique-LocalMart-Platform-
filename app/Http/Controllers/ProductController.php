@@ -83,8 +83,17 @@ class ProductController extends Controller
     public function show(Product $product)
     {
         $user = auth()->user();
+        if (!$user) {
+            return redirect()->route('login');
+        }
+        
         $cart = $user->cart;
-        $cardItem = CartItem::where(['product_id' => $product->id, 'cart_id' => $cart->id])->first();
+        $cardItem = null;
+        
+        if ($cart) {
+            $cardItem = CartItem::where(['product_id' => $product->id, 'cart_id' => $cart->id])->first();
+        }
+        
         $seller = $product->seller;
         $product->stock -= $cardItem->quantity ?? 0;
         $reviews = $product->reviews()->with('user')->latest()->take(3)->get();

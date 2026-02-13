@@ -42,6 +42,13 @@ class CheckoutController extends Controller
                 'quantity' => $item->quantity,
             ];
         }
+        
+        // Validate that we have at least one line item
+        if (empty($lineItems)) {
+            Log::error('No valid line items for order ' . $order->id);
+            return redirect()->back()->with('error', 'Cannot process payment: No valid products found in order');
+        }
+        
         // 4. Create the Session
         $session = Session::create([
             'payment_method_types' => ['card'],
