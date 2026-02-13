@@ -103,3 +103,5 @@ Route::resource('order', OrderController::class)->middleware(['auth', 'route.res
 Route::post('infos/{cart}', [OrderController::class, 'verifyInfo'])->middleware(['auth', 'route.restrictions'])->name('infoBeforeOrder');
 Route::resource('admin/products', ProductController::class)->middleware(['auth', 'route.restrictions']);
 // Route::resource('users', UserController::class)->middleware('auth');
+
+Route::post('/review.store/{product}', [ProductController::class,'reviewStore'])->middleware('auth')->name('review.store');

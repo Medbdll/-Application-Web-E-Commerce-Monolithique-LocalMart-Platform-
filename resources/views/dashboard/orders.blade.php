@@ -13,24 +13,31 @@
         <div class="grid grid-cols-4 gap-4 mb-8">
             <div class="bg-black border border-gray-900 p-4 rounded-xl flex items-center justify-between">
                 <div>
-                    <span class="text-gray-500 text-xs uppercase font-bold">Pending Processing</span>
-                    <p class="text-2xl font-gaming text-white">24</p>
+                    <span class="text-gray-500 text-xs uppercase font-bold">Total Orders</span>
+                    <p class="text-2xl font-gaming text-white">{{ $statistics['total_orders'] ?? 0 }}</p>
                 </div>
-                <div class="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></div>
+                <div class="w-2 h-2 rounded-full bg-vortexGreen animate-pulse"></div>
             </div>
             <div class="bg-black border border-gray-900 p-4 rounded-xl flex items-center justify-between">
                 <div>
-                    <span class="text-gray-500 text-xs uppercase font-bold">Shipped Today</span>
-                    <p class="text-2xl font-gaming text-[#39FF14]">18</p>
+                    <span class="text-gray-500 text-xs uppercase font-bold">Total Revenue</span>
+                    <p class="text-2xl font-gaming text-white">${{ number_format($statistics['total_revenue'] ?? 0, 2) }}</p>
                 </div>
                 <div class="w-2 h-2 rounded-full bg-[#39FF14]"></div>
             </div>
             <div class="bg-black border border-gray-900 p-4 rounded-xl flex items-center justify-between">
                 <div>
-                    <span class="text-gray-500 text-xs uppercase font-bold">Returns</span>
-                    <p class="text-2xl font-gaming text-red-500">2</p>
+                    <span class="text-gray-500 text-xs uppercase font-bold">Pending Orders</span>
+                    <p class="text-2xl font-gaming text-yellow-400">{{ $statistics['pending_orders'] ?? 0 }}</p>
                 </div>
-                <div class="w-2 h-2 rounded-full bg-red-500"></div>
+                <div class="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></div>
+            </div>
+            <div class="bg-black border border-gray-900 p-4 rounded-xl flex items-center justify-between">
+                <div>
+                    <span class="text-gray-500 text-xs uppercase font-bold">Paid Orders</span>
+                    <p class="text-2xl font-gaming text-green-400">{{ $statistics['paid_orders'] ?? 0 }}</p>
+                </div>
+                <div class="w-2 h-2 rounded-full bg-green-500"></div>
             </div>
         </div>
     </div>
@@ -80,8 +87,16 @@
                         <span class="px-2 py-1 bg-green-900/30 text-green-400 border border-green-900 rounded text-[10px] font-bold uppercase tracking-wide">{{ $order->payment_status }}</span>
                     </td>
                     <td class="px-6 py-4">
-                        @can('edit status order')
-                            <livewire:order-status :order="$order" />
+                        @can('editStatus', $order)
+                            <div class="text-xs text-gray-400">
+                                @if($allItemsShipped)
+                                    <span class="text-green-400">All items shipped</span>
+                                @elseif($hasPendingItems)
+                                    <span class="text-yellow-400">Some items pending</span>
+                                @else
+                                    <span class="text-gray-400">Mixed status</span>
+                                @endif
+                            </div>
                         @else
 
                             @if($allItemsShipped)
@@ -93,7 +108,6 @@
                             @endif
                             
                         @endcan
-                        
                     </td>
                     <td class="px-6 py-4 font-gaming font-bold text-lg">${{ number_format($order->total_price ?? 0, 2) }}</td>
                     
@@ -112,45 +126,7 @@
                             <div id="items-{{ $order->id }}" class="hidden border-t border-gray-800">
                                 <div class="p-6 space-y-4">
                                     @foreach($order->items as $item)
-                                        <div class="flex items-center justify-between bg-black/50 rounded-lg p-4 border border-gray-800">
-                                            <div class="flex items-center gap-4">
-                                                <div class="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center">
-                                                    <span class="text-gray-400 text-xs">📦</span>
-                                                </div>
-                                                <div>
-                                                    <h4 class="text-white font-semibold">
-                                                        {{ $item->product->name ?? 'Unknown Product' }}
-                                                        <span class="px-2 py-1 rounded text-xs
-                                                            @switch($item->status)
-                                                                @case('pending')
-                                                                    bg-yellow-900/30 text-yellow-400 border-yellow-900
-                                                                        @break
-                                                                    @case('processing')
-                                                                        bg-blue-900/30 text-blue-400 border-blue-900
-                                                                            @break
-                                                                        @case('shipped')
-                                                                            bg-green-900/30 text-green-400 border-green-900
-                                                                                @break
-                                                                            @case('delivered')
-                                                                                bg-purple-900/30 text-purple-400 border-purple-900
-                                                                                    @break
-                                                                                @case('cancelled')
-                                                                                    bg-red-900/30 text-red-400 border-red-900
-                                                                                        @break
-                                                                                    @default
-                                                                                        bg-gray-900/30 text-gray-400 border-gray-900
-                                                                            @endswitch
-                                                                ">
-                                                                    {{ ucfirst($item->status ?? 'N/A') }}
-                                                                </span>
-                                                    </h4>
-                                                    <p class="text-gray-500 text-xs">Qty: {{ $item->quantity }}</p>
-                                                </div>
-                                            </div>
-                                            <div class="text-right">
-                                                <p class="text-white font-semibold">${{ number_format($item->price, 2) }}</p>
-                                            </div>
-                                        </div>
+                                        <livewire:order-item-status :item-id="$item->id" />
                                     @endforeach
                                 </div>
                             </div>
@@ -172,9 +148,51 @@
             </tbody>
         </table>
     </div>
+    
+    <!-- Pagination -->
+    @if($orders->hasPages())
+        <div class="mt-6 flex justify-center">
+            <div class="bg-black border border-gray-900 rounded-lg p-2 flex items-center gap-1">
+                {{-- Previous Button --}}
+                @if($orders->onFirstPage())
+                    <span class="px-3 py-1 text-gray-600 text-xs font-sci-fi uppercase">Previous</span>
+                @else
+                    <a href="{{ $orders->previousPageUrl() }}" 
+                       class="px-3 py-1 text-gray-400 hover:text-vortexGreen hover:bg-gray-800 text-xs font-sci-fi uppercase transition-all rounded">
+                        Previous
+                    </a>
+                @endif
+                
+                {{-- Page Numbers --}}
+                @foreach($orders->links('components.pagination-links') as $link)
+                    {!! $link !!}
+                @endforeach
+                
+                {{-- Next Button --}}
+                @if($orders->hasMorePages())
+                    <a href="{{ $orders->nextPageUrl() }}" 
+                       class="px-3 py-1 text-gray-400 hover:text-vortexGreen hover:bg-gray-800 text-xs font-sci-fi uppercase transition-all rounded">
+                        Next
+                    </a>
+                @else
+                    <span class="px-3 py-1 text-gray-600 text-xs font-sci-fi uppercase">Next</span>
+                @endif
+            </div>
+        </div>
+        
+        <!-- Results Info -->
+        <div class="mt-4 text-center">
+            <p class="text-gray-500 text-xs font-sci-fi">
+                Showing {{ $orders->firstItem() ?? 0 }} to {{ $orders->lastItem() ?? 0 }} of {{ $orders->total() }} orders
+            </p>
+        </div>
+    @endif
     @endsection
 
 <script>
+document.addEventListener('livewire:load', function () {
+        $
+    });
 
 function toggleOrderItems(orderId) {
     const itemsDiv = document.getElementById(`items-${orderId}`);

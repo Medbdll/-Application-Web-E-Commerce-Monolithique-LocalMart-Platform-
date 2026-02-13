@@ -3,6 +3,7 @@
 namespace App\Policies;
 
 use App\Models\Product;
+use App\Models\Order;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
@@ -62,5 +63,18 @@ class ProductPolicy
     public function forceDelete(User $user, Product $product): bool
     {
         return $user->id === $product->user_id;
+    }
+
+    public function review(User $user, Product $product): bool
+    {
+        // Check if user has purchased this product through any paid order
+        $hasPurchased = Order::where('user_id', $user->id)
+            ->where('payment_status', 'paid')
+            ->whereHas('items', function ($query) use ($product) {
+                $query->where('product_id', $product->id);
+            })
+            ->exists();
+            
+        return $hasPurchased;
     }
 }
