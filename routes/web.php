@@ -14,8 +14,16 @@ use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Fortify\Http\Controllers\RegisteredUserController;
 use Laravel\Fortify\Http\Controllers\PasswordResetLinkController;
 use Laravel\Fortify\Http\Controllers\NewPasswordController;
+//stripe
+use App\Http\Controllers\CheckoutController;
 use Illuminate\Support\Facades\Mail;
 
+Route::post('/checkout/{order}', [CheckoutController::class, 'checkout'])->name('checkout');
+// The page the user lands on after a successful payment
+Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
+
+// The page the user lands on if they click "Back" or cancel on the Stripe page
+Route::get('/checkout/cancel', [CheckoutController::class, 'cancel'])->name('checkout.cancel');
 // Role-based redirect route
 Route::get('/', function () {
     if (Auth::check() && Auth::user()->hasRole(['admin', 'seller', 'moderator'])) {
@@ -60,20 +68,27 @@ Route::middleware(['auth', config('jetstream.auth_session'), 'verified', 'role:c
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::middleware(['auth', config('jetstream.auth_session'), 'verified', 'role:admin|seller', 'route.restrictions'])->group(function () {
+Route::middleware(['auth', config('jetstream.auth_session'), 'verified', 'role:admin|seller|moderator', 'route.restrictions'])->group(function () {
     Route::get('/dashboard', [dashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/product', [ProductController::class, 'index'])->name('product');
+});
+Route::middleware(['auth', config('jetstream.auth_session'), 'verified', 'role:admin|seller', 'route.restrictions'])->group(function () {
     Route::get('/dashboard/orders', [OrderController::class, 'index'])->name('orders');
-   });
+});
 
 Route::middleware(['auth', config('jetstream.auth_session'), 'verified', 'role:admin', 'route.restrictions'])->group(function () {
-    Route::get('/dashboard/users', [UserController::class, 'index'])->name('users');
     Route::get('/dashboard/users/update/{id}', [UserController::class, 'update'])->name('users.update');
-    Route::post('/dashboard/users/userStatus', [UserController::class, 'userStatus'])->name('users.userStatus');
     Route::post('/dashboard/users/create', [UserController::class, 'store'])->name('users.store');
 });
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+Route::middleware(['auth', config('jetstream.auth_session'), 'verified', 'role:admin|moderator', 'route.restrictions'])->group(function () {
+    Route::get('/dashboard/users', [UserController::class, 'index'])->name('users');
+    Route::post('/dashboard/users/userStatus', [UserController::class, 'userStatus'])->name('users.userStatus');
+});
+>>>>>>> ef54d5561db0fd5aa64012024089763b910f2a06
 
 =======
 // Route::middleware(['auth', config('jetstream.auth_session'), 'verified', 'role:moderator'])->group(function () {
@@ -103,5 +118,3 @@ Route::resource('order', OrderController::class)->middleware(['auth', 'route.res
 Route::post('infos/{cart}', [OrderController::class, 'verifyInfo'])->middleware(['auth', 'route.restrictions'])->name('infoBeforeOrder');
 Route::resource('admin/products', ProductController::class)->middleware(['auth', 'route.restrictions']);
 // Route::resource('users', UserController::class)->middleware('auth');
-
-

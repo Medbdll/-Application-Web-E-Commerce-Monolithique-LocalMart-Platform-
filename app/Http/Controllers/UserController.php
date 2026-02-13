@@ -15,11 +15,44 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $usersWithoutAdmin = User::with('roles')
+        $query = User::with('roles')
             ->whereDoesntHave('roles', function($query) {
                 $query->where('name', 'admin');
-            })
-            ->simplePaginate(5);
+            });
+
+        // Search functionality
+        if ($request->filled('search')) {
+            $searchTerm = $request->input('search');
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('name', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('email', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('id', 'like', '%' . $searchTerm . '%');
+            });
+        }
+
+        // Role filter
+        if ($request->filled('role') && $request->input('role') !== 'All Roles') {
+            $roleFilter = $request->input('role');
+            $roleMap = [
+                'client' => 'client',
+                'seller' => 'seller', 
+                'moderator' => 'moderator'
+            ];
+            
+            if (isset($roleMap[$roleFilter])) {
+                $query->whereHas('roles', function($q) use ($roleFilter, $roleMap) {
+                    $q->where('name', $roleMap[$roleFilter]);
+                });
+            }
+        }
+
+        // Status filter
+        if ($request->filled('status') && $request->input('status') !== 'Status: All') {
+            $statusFilter = $request->input('status');
+            $query->where('status', $statusFilter);
+        }
+
+        $usersWithoutAdmin = $query->simplePaginate(5);
 
         $allUsers = User::with('roles')->get();
         $allRoles = Role::all();

@@ -65,14 +65,5 @@
 
     <x-cards :products="$products"/>
 
-    <!-- Back to all categories -->
-    <section class="max-w-7xl mx-auto px-6 py-8">
-        <div class="text-center">
-            <a href="{{ route('home') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-transparent border border-gray-700 text-gray-400 font-medium rounded-sm hover:border-neon hover:text-neon transition-all duration-300">
-                <i class="fa-solid fa-arrow-left"></i>
-                Back to All Products
-            </a>
-        </div>
-    </section>
 
 @endsection

@@ -75,6 +75,7 @@ class ProfileController extends Controller
                 'address_line1' => $validated['address_line1'],
                 'city' => $validated['city'],
                 'postal_code' => $validated['postal_code'],
+                'country' => 'Morocco', // Default country
                 'phone' => $validated['phone'],
             ]);
         }
