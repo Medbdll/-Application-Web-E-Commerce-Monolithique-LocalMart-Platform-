@@ -60,6 +60,17 @@ class SellerEmail extends Mailable
     {
         return new Content(
             view: 'mail.seller_email',
+            with: [
+                'seller_name' => $this->seller_name,
+                'order_id' => $this->order_id,
+                'customer_name' => $this->customer_name,
+                'product_name' => $this->product_name,
+                'quantity' => $this->quantity,
+                'total_amount' => $this->total_amount,
+                'payment_status' => $this->payment_status,
+                'order_link' => $this->order_link
+
+            ]
         );
     }
 
@@ -70,7 +81,9 @@ class SellerEmail extends Mailable
      */
     public function attachments(): array
     {
-        return [];
+        return [
+
+        ];
     }
 }
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Confirmed</title>
+    <title>Order Status Updated</title>
 </head>
 
 <body style="margin:0; padding:0; background-color:#f5f7fa; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
@@ -17,14 +17,14 @@
 
                 <!-- Top Accent Bar -->
                 <tr>
-                    <td style="height:4px; background-color:#2563eb;"></td>
+                    <td style="height:4px; background-color:#16a34a;"></td>
                 </tr>
 
                 <!-- Header -->
                 <tr>
                     <td style="padding:30px 40px 10px 40px;">
                         <h2 style="margin:0; font-size:18px; font-weight:600; color:#111827;">
-                           Vortex Your Store
+                            Vortex Your Store
                         </h2>
                     </td>
                 </tr>
@@ -33,7 +33,7 @@
                 <tr>
                     <td style="padding:10px 40px 0 40px;">
                         <h1 style="margin:0; font-size:22px; font-weight:600; color:#111827;">
-                            Payment confirmed
+                            Order Status Updated
                         </h1>
                     </td>
                 </tr>
@@ -47,7 +47,14 @@
                         </p>
 
                         <p style="margin:0 0 16px 0;">
-                            We’ve successfully received your payment. Your order is now being processed.
+                            Your order status has been updated by the seller.
+                        </p>
+
+                        <p style="margin:0 0 16px 0;">
+                            New Status:
+                            <strong style="color:#16a34a;">
+                                {{ ucfirst($order_status ?? 'Processing') }}
+                            </strong>
                         </p>
 
                     </td>
@@ -61,13 +68,13 @@
                                 <td style="padding:20px; font-size:14px; line-height:22px; color:#374151;">
 
                                     <strong>Order ID</strong><br>
-                                    #{{ $order_id }}<br><br>
+                                    #{{ $order_id ?? '000123' }}<br><br>
 
-                                    <strong>Total Paid</strong><br>
-                                    ${{ $total_amount }}<br><br>
+                                    <strong>Product</strong><br>
+                                    {{ $product_name ?? 'Product Name' }}<br><br>
 
-                                    <strong>Payment Method</strong><br>
-                                    {{ $payment_method }}
+                                    <strong>Estimated Delivery</strong><br>
+                                    {{ $estimated_delivery ?? '2–5 business days' }}
 
                                 </td>
                             </tr>
@@ -79,8 +86,8 @@
                 <tr>
                     <td align="left" style="padding:10px 40px 30px 40px;">
                         <a href="{{ $order_link ?? '#' }}"
-                           style="background-color:#2563eb; color:#ffffff; text-decoration:none; padding:12px 22px; font-size:14px; font-weight:600; border-radius:6px; display:inline-block;">
-                            View order
+                           style="background-color:#16a34a; color:#ffffff; text-decoration:none; padding:12px 22px; font-size:14px; font-weight:600; border-radius:6px; display:inline-block;">
+                            Track Order
                         </a>
                     </td>
                 </tr>
@@ -95,12 +102,15 @@
                 <!-- Footer -->
                 <tr>
                     <td style="padding:20px 40px 40px 40px; font-size:12px; line-height:18px; color:#6b7280;">
-                        If you have any questions, contact us at
-                        <a href="mailto:{{ $support_email ?? 'support@example.com' }}" style="color:#2563eb; text-decoration:none;">
+
+                        If you have questions, contact us at
+                        <a href="mailto:{{ $support_email ?? 'support@example.com' }}"
+                           style="color:#16a34a; text-decoration:none;">
                             {{ $support_email ?? 'support@example.com' }}
                         </a>.<br><br>
 
-                        © {{ date('Y') }} vortex Your Store All rights reserved.
+                        © {{ date('Y') }} Vortex Your Store All rights reserved.
+
                     </td>
                 </tr>
 

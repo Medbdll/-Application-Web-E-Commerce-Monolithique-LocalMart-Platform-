@@ -9,34 +9,29 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class ClientPayement extends Mailable
+class StatusMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+public $customer_name;
+public $order_id;
+public $product_name;
+public $order_status ;
+public $estimated_delivery;
+public $order_link;
+public $support_email;
     /**
      * Create a new message instance.
      */
-
-    public $seller_name;
-    public $order_id;
-    public $customer_name;
-    public $product_name;
-    public $quantity;
-    public $total_amount;
-    public $payment_method;
-
-    public $order_link;
-    public function __construct($seller_name , $order_id , $customer_name ,$product_name, $quantity,$total_amount , $payment_method  , $order_link )
+    public function __construct($customer_name , $order_id , $product_name , $order_status , $estimated_delivery , $order_link , $support_email)
     {
-        $this->seller_name = $seller_name;
-        $this->order_id = $order_id;
         $this->customer_name = $customer_name;
+        $this->order_id = $order_id ;
         $this->product_name = $product_name;
-        $this->quantity = $quantity;
-        $this->total_amount = $total_amount;
+        $this->order_status = $order_status;
+        $this->estimated_delivery = $estimated_delivery;
         $this->order_link = $order_link;
-        $this->payment_method = $payment_method;
-
+        $this->support_email = $support_email;
     }
 
     /**
@@ -45,7 +40,7 @@ class ClientPayement extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "Payment Confirmed - Order #{$this->order_id}",
+            subject: "Order #{$this->order_id} Status Updated to " . ucfirst($this->order_status),
         );
     }
 
@@ -55,16 +50,17 @@ class ClientPayement extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'mail.client_payment',
+            view: 'mail.status_Mail',
             with: [
                 'customer_name' => $this->customer_name,
+                'order_status' => $this->order_status,
                 'order_id' => $this->order_id,
-                'total_amount' => $this->total_amount,
-                'payment_method' => $this->payment_method,
+                'product_name' => $this->product_name,
+                'estimated_delivery' => $this->estimated_delivery,
                 'order_link' => $this->order_link,
+                'support_email' => $this->support_email
 
             ]
-
         );
     }
 
