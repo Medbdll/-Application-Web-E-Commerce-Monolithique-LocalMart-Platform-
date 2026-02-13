@@ -19,9 +19,21 @@ class OrderController extends Controller
     {
         if ($this->isAdmin()) {
 
-            $orders = Order::with(['user', 'items.product'])->latest()->get();
+            // Get all orders for statistics (without pagination)
+            $allOrders = Order::with(['user', 'items.product'])->latest()->get();
+            
+            // Get paginated orders for display
+            $orders = Order::with(['user', 'items.product'])->orderBy('created_at', 'desc')->paginate(10);
 
-            return view('dashboard.orders', compact('orders'));
+            // Calculate statistics from all orders
+            $statistics = [
+                'total_orders' => $allOrders->count(),
+                'total_revenue' => $allOrders->where('payment_status', 'paid')->sum('total_price'),
+                'pending_orders' => $allOrders->where('payment_status', 'pending')->count(),
+                'paid_orders' => $allOrders->where('payment_status', 'paid')->count(),
+            ];
+
+            return view('dashboard.orders', compact('orders', 'statistics'));
 
         } elseif ($this->isSeller()) {
 
@@ -37,17 +49,41 @@ class OrderController extends Controller
                 $order->items = $items;
                 $orders[] = $order;
             }
-
             // Filter seller orders to show only paid orders
-            $orders = collect($orders)->where('payment_status', 'paid');
-
-            return view('dashboard.orders', compact('orders'));
+            $allOrders = collect($orders)->where('payment_status', 'paid');
+            
+            // Calculate statistics for seller
+            $statistics = [
+                'total_orders' => $allOrders->count(),
+                'total_revenue' => $allOrders->sum('total_price'),
+                'pending_orders' => collect($orders)->where('payment_status', 'pending')->count(),
+                'paid_orders' => $allOrders->count(),
+            ];
+            
+            // Convert to LengthAwarePaginator for pagination
+            $currentPage = request()->get('page', 1);
+            $perPage = 10;
+            $total = $allOrders->count();
+            $ordersCollection = $allOrders->forPage($currentPage, $perPage);
+            
+            $orders = new \Illuminate\Pagination\LengthAwarePaginator(
+                $ordersCollection,
+                $total,
+                $perPage,
+                $currentPage,
+                [
+                    'path' => request()->url(),
+                    'pageName' => 'page',
+                ]
+            );
+            
+            return view('dashboard.orders', compact('orders', 'statistics'));
         } elseif ($this->isClient()) {
 
             $orders = Order::where('user_id', $this->authenticatedUser()->id)
                 ->with(['items.product'])
                 ->latest()
-                ->get();
+                ->paginate(10);
 
             return view('client.orders', compact('orders'));
 
@@ -75,32 +111,69 @@ class OrderController extends Controller
             $cartId = $request->cart_id;
             $addressId = $request->address_id;
             $userId = $this->authenticatedUser()->id;
-            $order = Order::create([
-                'user_id' => $userId,
-                'cart_id' => $cartId,
-                'total_price' => $total,
-                'address_id' => $addressId,
-            ]);
+
+            // Get cart items with products for validation
             $cartItems = CartItem::with('product')->where('cart_id', $cartId)->get();
+
+            // Check if cart is empty
+            if ($cartItems->isEmpty()) {
+                return redirect()->back()->with('error', 'Your cart is empty. Please add items before placing an order.');
+            }
+
+            // Validate stock availability
             foreach ($cartItems as $item) {
-                // Skip items without valid products
                 if (!$item->product) {
                     Log::warning('Skipping cart item ' . $item->id . ' - product not found');
                     $item->delete();
                     continue;
                 }
-                
-                $order->items()->create([
-                    'order_id' => $order->id,
-                    'product_id' => $item->product_id,
-                    'quantity' => $item->quantity,
-                    'price' => $item->price,
-                    'seller_id' => $item->product->user_id,
-                ]);
-                $item->delete();
+
+                if ($item->product->stock < $item->quantity) {
+                    return redirect()->back()->with('error', "Insufficient stock for product: {$item->product->name}. Available: {$item->product->stock}, Requested: {$item->quantity}");
+                }
             }
 
-            return redirect()->route('order.index');
+            // Use database transaction for data integrity
+            DB::beginTransaction();
+            try {
+                $order = Order::create([
+                    'user_id' => $userId,
+                    'cart_id' => $cartId,
+                    'total_price' => $total,
+                    'address_id' => $addressId,
+                ]);
+
+                foreach ($cartItems as $item) {
+                    // Skip items without valid products (already validated above)
+                    if (!$item->product) {
+                        continue;
+                    }
+                    
+                    // Create order item
+                    $order->items()->create([
+                        'order_id' => $order->id,
+                        'product_id' => $item->product_id,
+                        'quantity' => $item->quantity,
+                        'price' => $item->price,
+                        'seller_id' => $item->product->user_id,
+                    ]);
+
+                    // Reduce product stock
+                    $item->product->decrement('stock', $item->quantity);
+                    
+                    // Remove item from cart
+                    $item->delete();
+                }
+
+                DB::commit();
+                return redirect()->route('order.index')->with('success', 'Order placed successfully!');
+                
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Order creation failed: ' . $e->getMessage());
+                return redirect()->back()->with('error', 'Failed to place order. Please try again.');
+            }
+
         } else {
             abort(403);
         }

@@ -6,6 +6,7 @@ use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
@@ -77,11 +78,21 @@ class ProductController extends Controller
     {
         $user = auth()->user();
         $cart = $user->cart;
-        $cardItem = CartItem::where(['product_id' => $product->id, 'cart_id' => $cart->id])->first();
+        
+        // Check if cart exists before trying to access it
+        if (!$cart) {
+            abort(404, 'Cart not found');
+        }
+        
+        $cartItem = CartItem::where(['product_id' => $product->id, 'cart_id' => $cart->id])->first();
         $seller = $product->seller;
-        $product->stock -= $cardItem->quantity ?? 0;
+        $availableStock = $product->stock - ($cartItem->quantity ?? 0);
         $reviews = $product->reviews()->with('user')->latest()->take(3)->get();
-        return view('client.product_details', compact('product', 'seller','reviews'));
+        
+        // Get user's existing review for this product
+        $userReview = $product->reviews()->where('user_id', $user->id)->first();
+        
+        return view('client.product_details', compact('product', 'seller', 'reviews', 'userReview', 'availableStock'));
     }
 
     /**
@@ -144,7 +155,27 @@ class ProductController extends Controller
 
     }
 
-
-
-
+    public function reviewStore(Request $request, Product $product) {
+        // Check if user is client and has purchased the product
+        if (auth()->user()->hasRole('client')) {
+            $this->authorize('review', $product);
+            
+            // Validate input
+            $request->validate([
+                'rating' => 'required|integer|min:1|max:5',
+                'comment' => 'required|string|max:500'
+            ]);
+            
+            Review::create([
+                'user_id' => auth()->user()->id,
+                'product_id' => $product->id,
+                'rating' => $request->rating,
+                'comment' => $request->comment
+            ]);
+            
+            return response()->json(['message' => 'Review added successfully']);
+        }
+        
+        return response()->json(['error' => 'Unauthorized'], 403);
+    }
 }
