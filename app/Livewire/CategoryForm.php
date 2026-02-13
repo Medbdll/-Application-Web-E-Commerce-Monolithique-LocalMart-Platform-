@@ -32,7 +32,12 @@ class CategoryForm extends Component
 
     public function loadCategory($id)
     {
-        $category = Category::findOrFail($id);
+        $category = Category::find($id);
+        if (!$category) {
+            $this->dispatch('error', 'Category not found');
+            return;
+        }
+        
         $this->categoryId = $category->id;
         $this->name = $category->name;
         $this->slug = $category->slug;
