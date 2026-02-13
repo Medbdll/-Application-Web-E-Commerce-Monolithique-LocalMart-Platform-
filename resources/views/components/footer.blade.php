@@ -2,7 +2,7 @@
         <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
             <div class="col-span-1 md:col-span-1">
                 <div class="flex items-center gap-1 mb-6">
-                    <img src="assets/images/logoV.svg" alt="Vortox Logo" class="h-8 w-auto">
+                    <img src="{{ asset('assets/images/logoV.svg') }}" alt="Vortox Logo" class="h-6 w-auto">
                     <span class="text-vortexGreen text-2xl font-display font-bold tracking-widest uppercase">Vortox</span>
                 </div>
                 <ul class="space-y-4 text-sm text-gray-300">
