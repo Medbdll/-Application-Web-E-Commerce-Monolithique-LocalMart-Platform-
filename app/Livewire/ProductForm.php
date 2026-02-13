@@ -28,7 +28,10 @@ class ProductForm extends Component
 
     public function save()
     {
-
+        if (!auth()->check()) {
+            $this->dispatch('error', 'You must be logged in to perform this action');
+            return;
+        }
 
         $validated = $this->validate([
             'name' => 'required|string|max:255',
@@ -74,6 +77,11 @@ class ProductForm extends Component
     {
         if ($id) {
             $product = Product::find($id);
+            if (!$product) {
+                $this->dispatch('error', 'Product not found');
+                return;
+            }
+            
             $this->productId = $product->id;
             $this->name = $product->name;
             $this->description = $product->description;
