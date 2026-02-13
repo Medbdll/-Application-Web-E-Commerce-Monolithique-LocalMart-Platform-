@@ -80,25 +80,10 @@ Route::middleware(['auth', config('jetstream.auth_session'), 'verified', 'role:a
     Route::get('/dashboard/users/update/{id}', [UserController::class, 'update'])->name('users.update');
     Route::post('/dashboard/users/create', [UserController::class, 'store'])->name('users.store');
 });
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
 Route::middleware(['auth', config('jetstream.auth_session'), 'verified', 'role:admin|moderator', 'route.restrictions'])->group(function () {
     Route::get('/dashboard/users', [UserController::class, 'index'])->name('users');
     Route::post('/dashboard/users/userStatus', [UserController::class, 'userStatus'])->name('users.userStatus');
 });
->>>>>>> ef54d5561db0fd5aa64012024089763b910f2a06
-
-=======
-// Route::middleware(['auth', config('jetstream.auth_session'), 'verified', 'role:moderator'])->group(function () {
-//     Route::get('/dashboard/users', [UserController::class, 'index'])->name('users');
-//     Route::post('/dashboard/users/userStatus', [UserController::class, 'userStatus'])->name('users.userStatus');
-// });
->>>>>>> 03008cf9c766fa16ac593105550302d0a11150a9
-=======
-
->>>>>>> 5396497b10461534d77ae27e02427986c7b4fd6f
 
 Route::middleware(['auth', config('jetstream.auth_session'), 'verified', 'role:client', 'route.restrictions'])->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
