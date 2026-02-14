@@ -8,10 +8,21 @@ RUN apt-get update && apt-get install -y \
     unzip \
     libzip-dev \
     libonig-dev \
-    libpng-dev
+    libpng-dev \
+    libicu-dev \
+    libcurl4-openssl-dev \
+    libxml2-dev
 
-# Install PHP extensions
-RUN docker-php-ext-install pdo pdo_mysql zip
+# Install PHP extensions REQUIRED by Laravel + Stripe
+RUN docker-php-ext-install \
+    pdo \
+    pdo_mysql \
+    mbstring \
+    zip \
+    intl \
+    bcmath \
+    curl \
+    opcache
 
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
@@ -25,14 +36,16 @@ WORKDIR /var/www
 # Copy project
 COPY . .
 
-# Install Laravel dependencies
-RUN composer install --no-dev --optimize-autoloader
+# Install Laravel dependencies (NOW WILL WORK)
+RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
 # Set Apache public folder
 RUN sed -i 's|/var/www/html|/var/www/public|g' /etc/apache2/sites-available/000-default.conf
 
-# Permissions
-RUN chmod -R 777 storage bootstrap/cache
+# Set correct permissions
+RUN chown -R www-data:www-data /var/www \
+    && chmod -R 755 /var/www \
+    && chmod -R 775 storage bootstrap/cache
 
 EXPOSE 80
 
