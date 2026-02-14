@@ -18,6 +18,11 @@ use Laravel\Fortify\Http\Controllers\NewPasswordController;
 use App\Http\Controllers\CheckoutController;
 use Illuminate\Support\Facades\Mail;
 
+// Health check route for Render
+Route::get('/health', function () {
+    return response()->json(['status' => 'ok'], 200);
+});
+
 Route::post('/checkout/{order}', [CheckoutController::class, 'checkout'])->name('checkout');
 // The page the user lands on after a successful payment
 Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
