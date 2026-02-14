@@ -39,6 +39,17 @@ COPY . .
 # Install Laravel dependencies (NOW WILL WORK)
 RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
+# Generate application key if not exists
+RUN php artisan key:generate --force
+
+# Run database migrations
+RUN php artisan migrate --force
+
+# Cache configuration for production
+RUN php artisan config:cache
+RUN php artisan route:cache
+RUN php artisan view:cache
+
 # Set Apache public folder
 RUN sed -i 's|/var/www/html|/var/www/public|g' /etc/apache2/sites-available/000-default.conf
 

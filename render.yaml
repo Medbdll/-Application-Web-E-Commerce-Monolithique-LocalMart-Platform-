@@ -1,0 +1,46 @@
+services:
+  # Web Service
+  - type: web
+    name: localmart-platform
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_URL
+        value: https://localmart-platform.onrender.com
+      - key: LOG_CHANNEL
+        value: errorlog
+      - key: DB_CONNECTION
+        value: mysql
+      - key: DB_HOST
+        fromDatabase:
+          name: localmart-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: localmart-db
+          property: port
+      - key: DB_DATABASE
+        fromDatabase:
+          name: localmart-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: localmart-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: localmart-db
+          property: password
+
+databases:
+  # Database Service
+  - name: localmart-db
+    plan: free
+    ipAllowList: []
