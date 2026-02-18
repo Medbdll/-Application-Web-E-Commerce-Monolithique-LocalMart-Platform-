@@ -11,12 +11,14 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libicu-dev \
     libcurl4-openssl-dev \
-    libxml2-dev
+    libxml2-dev \
+    libpq-dev
 
 # Install PHP extensions
 RUN docker-php-ext-install \
     pdo \
     pdo_mysql \
+    pdo_pgsql \
     mbstring \
     zip \
     intl \
