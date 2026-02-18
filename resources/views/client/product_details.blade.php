@@ -51,8 +51,8 @@
                     <div class="flex items-center gap-4 mb-6">
                         <div>
                             <span class="text-gray-400 text-sm">Stock Status:</span>
-                            @if($product->stock > 0)
-                                <span class="text-vortexGreen font-bold">{{ $product->stock }} units available</span>
+                            @if($availableStock > 0)
+                                <span class="text-vortexGreen font-bold">{{ $availableStock }} units available</span>
                             @else
                                 <span class="text-red-500 font-bold">Out of stock</span>
                             @endif
@@ -70,7 +70,7 @@
                     <div id="stock-warning" class="hidden">
                         <div  class=" bg-red-500/20 border border-red-500 text-red-400 px-4 py-3 rounded-lg mb-4 flex items-center gap-3">
                             <i class="fa-solid fa-exclamation-triangle"></i>
-                            <span class="text-sm">Only <span id="available-stock">{{ $product->stock }}</span> units available in stock!</span>
+                            <span class="text-sm">Only <span id="available-stock">{{ $availableStock }}</span> units available in stock!</span>
                         </div>
                     </div>
                     
@@ -105,57 +105,113 @@
             
             <div class="mb-8 p-4 border border-gray-800 bg-card-bg/50 relative group">
                 <div class="absolute top-0 left-0 w-1 h-full bg-vortexGreen/20 group-hover:bg-vortexGreen transition-colors duration-300"></div>
-                <h4 class="text-xs font-sci-fi text-gray-400 uppercase tracking-widest mb-3">Add_New_Entry</h4>
                 
-                <form action="#" method="POST">
-                    @csrf
-                    <div class="space-y-3">
-                        <div>
-                            <label class="block text-[10px] font-sci-fi text-vortexGreen uppercase tracking-[0.2em] mb-1">Rating_Class</label>
-                            <div class="flex flex-row-reverse justify-end w-fit">
-                                <input type="radio" id="star5" name="rating" value="5" class="peer hidden">
-                                <label for="star5" class="peer text-gray-700 text-lg cursor-pointer hover:text-vortexGreen peer-hover:text-vortexGreen peer-checked:text-vortexGreen transition-colors px-1"><i class="fa-solid fa-star"></i></label>
-                                
-                                <input type="radio" id="star4" name="rating" value="4" class="peer hidden">
-                                <label for="star4" class="peer text-gray-700 text-lg cursor-pointer hover:text-vortexGreen peer-hover:text-vortexGreen peer-checked:text-vortexGreen transition-colors px-1"><i class="fa-solid fa-star"></i></label>
-                                
-                                <input type="radio" id="star3" name="rating" value="3" class="peer hidden">
-                                <label for="star3" class="peer text-gray-700 text-lg cursor-pointer hover:text-vortexGreen peer-hover:text-vortexGreen peer-checked:text-vortexGreen transition-colors px-1"><i class="fa-solid fa-star"></i></label>
-                                
-                                <input type="radio" id="star2" name="rating" value="2" class="peer hidden">
-                                <label for="star2" class="peer text-gray-700 text-lg cursor-pointer hover:text-vortexGreen peer-hover:text-vortexGreen peer-checked:text-vortexGreen transition-colors px-1"><i class="fa-solid fa-star"></i></label>
-                                
-                                <input type="radio" id="star1" name="rating" value="1" class="peer hidden">
-                                <label for="star1" class="peer text-gray-700 text-lg cursor-pointer hover:text-vortexGreen peer-hover:text-vortexGreen peer-checked:text-vortexGreen transition-colors px-1"><i class="fa-solid fa-star"></i></label>
+                @if($userReview)
+                    <h4 class="text-xs font-sci-fi text-gray-400 uppercase tracking-widest mb-3">Your_Review</h4>
+                    
+                    <div class="bg-black/50 border border-gray-800 p-4 rounded-lg">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-[11px] font-sci-fi text-vortexGreen">{{ $userReview->user->name }}</span>
+                            <div class="flex text-vortexGreen text-[9px] gap-0.5">
+                                @for($i = 1; $i <= 5; $i++)
+                                    <i class="fa-solid fa-star {{ $i <= $userReview->rating ? '' : 'text-gray-700' }}"></i>
+                                @endfor
                             </div>
                         </div>
-                        
-                        <div>
-                            <label class="block text-[10px] font-sci-fi text-vortexGreen uppercase tracking-[0.2em] mb-1">Observation_Log</label>
-                            <textarea name="comment" rows="2" class="w-full bg-black border border-gray-800 text-gray-300 p-2 text-sm focus:border-vortexGreen focus:ring-1 focus:ring-vortexGreen focus:outline-none transition-all placeholder-gray-700" placeholder="Enter your observations..."></textarea>
-                        </div>
-
-                        <button type="submit" class="bg-vortexGreen text-black font-sci-fi font-bold uppercase px-6 py-2 text-[10px] tracking-[0.2em] hover:bg-white transition-all duration-300">
-                            Submit_Entry
-                        </button>
+                        <p class="text-gray-400 text-xs italic">"{{ $userReview->comment }}"</p>
+                        <p class="text-gray-500 text-[10px] mt-2">Reviewed on {{ $userReview->created_at->format('M j, Y') }}</p>
                     </div>
-                </form>
+                @else
+                    <h4 class="text-xs font-sci-fi text-gray-400 uppercase tracking-widest mb-3">Add_New_Entry</h4>
+                    
+                    <form id="reviewForm" action="{{ route('review.store',$product) }}" method="POST">
+                        @csrf
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-[10px] font-sci-fi text-vortexGreen uppercase tracking-[0.2em] mb-1">Rating_Class</label>
+                                <div class="flex flex-row-reverse justify-end w-fit">
+                                    <input type="radio" id="star5" name="rating" value="5" class="peer hidden">
+                                    <label for="star5" class="peer text-gray-700 text-lg cursor-pointer hover:text-vortexGreen peer-hover:text-vortexGreen peer-checked:text-vortexGreen transition-colors px-1"><i class="fa-solid fa-star"></i></label>
+                                    
+                                    <input type="radio" id="star4" name="rating" value="4" class="peer hidden">
+                                    <label for="star4" class="peer text-gray-700 text-lg cursor-pointer hover:text-vortexGreen peer-hover:text-vortexGreen peer-checked:text-vortexGreen transition-colors px-1"><i class="fa-solid fa-star"></i></label>
+                                    
+                                    <input type="radio" id="star3" name="rating" value="3" class="peer hidden">
+                                    <label for="star3" class="peer text-gray-700 text-lg cursor-pointer hover:text-vortexGreen peer-hover:text-vortexGreen peer-checked:text-vortexGreen transition-colors px-1"><i class="fa-solid fa-star"></i></label>
+                                    
+                                    <input type="radio" id="star2" name="rating" value="2" class="peer hidden">
+                                    <label for="star2" class="peer text-gray-700 text-lg cursor-pointer hover:text-vortexGreen peer-hover:text-vortexGreen peer-checked:text-vortexGreen transition-colors px-1"><i class="fa-solid fa-star"></i></label>
+                                    
+                                    <input type="radio" id="star1" name="rating" value="1" class="peer hidden">
+                                    <label for="star1" class="peer text-gray-700 text-lg cursor-pointer hover:text-vortexGreen peer-hover:text-vortexGreen peer-checked:text-vortexGreen transition-colors px-1"><i class="fa-solid fa-star"></i></label>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-[10px] font-sci-fi text-vortexGreen uppercase tracking-[0.2em] mb-1">Observation_Log</label>
+                                <textarea name="comment" rows="2" class="w-full bg-black border border-gray-800 text-gray-300 p-2 text-sm focus:border-vortexGreen focus:ring-1 focus:ring-vortexGreen focus:outline-none transition-all placeholder-gray-700" placeholder="Enter your observations..."></textarea>
+                            </div>
+
+                            <button type="submit" class="bg-vortexGreen text-black font-sci-fi font-bold uppercase px-6 py-2 text-[10px] tracking-[0.2em] hover:bg-white transition-all duration-300">
+                                Submit_Entry
+                            </button>
+                        </div>
+                    </form>
+                @endif
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 @foreach ($reviews as $review)
-                <div class="bg-card-bg border border-gray-800 p-5 product-card-glow">
-                    <div class="flex justify-between mb-3">
-                        <span class="text-[11px] font-sci-fi text-vortexGreen">{{ $review->user->name }}</span>
-                        <div class="flex text-vortexGreen text-[9px] gap-0.5"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
-                    </div>
-                    <p class="text-gray-400 text-xs italic">"{{ $review->comment }}"</p>
-                </div>
+                    @if($userReview && $userReview->id != $review->id)
+                        <div class="bg-card-bg border border-gray-800 p-5 product-card-glow">
+                            <div class="flex justify-between mb-3">
+                                <span class="text-[11px] font-sci-fi text-vortexGreen">{{ $review->user->name }}</span>
+                                <div class="flex text-vortexGreen text-[9px] gap-0.5">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        <i class="fa-solid fa-star"></i>
+                                    @endfor
+                                </div>
+                            </div>
+                            <p class="text-gray-400 text-xs italic">"{{ $review->comment }}"</p>
+                        </div>
+                    @endif
                 @endforeach
             </div>
         </div>
         <script>
-            window.productStock = {{ $product->stock }};
+            window.productStock = {{ $availableStock }};
+            
+            // Handle review form submission
+            document.getElementById('reviewForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const form = this;
+                const formData = new FormData(form);
+                
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        // Show success message
+                        alert(data.message);
+                        // Reset form
+                        form.reset();
+                        // Optionally reload page to show new review
+                        setTimeout(() => location.reload(), 1000);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error submitting review. Please try again.');
+                });
+            });
         </script>
         <script src="{{ asset('js/products_details.js') }}"></script>
     </main>

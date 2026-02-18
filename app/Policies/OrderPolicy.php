@@ -44,6 +44,26 @@ class OrderPolicy
     }
 
     /**
+     * Determine whether the user can edit order status.
+     */
+    public function editStatus(User $user, Order $order): bool
+    {
+        // Admin can edit any order status
+        if ($user->hasRole('admin')) {
+            return true;
+        }
+        
+        // Seller can only edit status of orders containing their products
+        if ($user->hasRole('seller')) {
+            return $order->items()->whereHas('product', function ($query) use ($user) {
+                $query->where('seller_id', $user->id);
+            })->exists();
+        }
+        
+        return false;
+    }
+
+    /**
      * Determine whether the user can delete the model.
      */
     public function delete(User $user, Order $order): bool
