@@ -22,9 +22,7 @@ RUN docker-php-ext-install \
     intl \
     bcmath \
     curl \
-    opcache \
-    gd \
-    dom
+    opcache
 
 # Enable Apache rewrite
 RUN a2enmod rewrite
@@ -38,20 +36,8 @@ WORKDIR /var/www
 # Copy project
 COPY . .
 
-# Copy environment file
-RUN cp .env.example .env
-
 # Install dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
-
-# Run database migrations
-RUN php artisan migrate --no-interaction --force
-
-# Optimize Laravel
-RUN php artisan config:cache \
-    && php artisan route:cache \
-    && php artisan view:cache
-
 
 # Set Apache public folder
 RUN sed -i 's|/var/www/html|/var/www/public|g' /etc/apache2/sites-available/000-default.conf
