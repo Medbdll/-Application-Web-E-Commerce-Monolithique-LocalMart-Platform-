@@ -11,20 +11,20 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libicu-dev \
     libcurl4-openssl-dev \
-    libxml2-dev
+    libxml2-dev \
+    libpq-dev
 
 # Install PHP extensions
 RUN docker-php-ext-install \
     pdo \
     pdo_mysql \
+    pdo_pgsql \
     mbstring \
     zip \
     intl \
     bcmath \
     curl \
-    opcache \
-    gd \
-    dom
+    opcache
 
 # Enable Apache rewrite
 RUN a2enmod rewrite
@@ -38,19 +38,8 @@ WORKDIR /var/www
 # Copy project
 COPY . .
 
-# Copy environment file
-RUN cp .env.example .env
-
 # Install dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
-
-# Run database migrations
-RUN php artisan migrate --no-interaction --force
-
-# Optimize Laravel
-RUN php artisan config:cache \
-    && php artisan route:cache \
-    && php artisan view:cache
 
 
 # Set Apache public folder
