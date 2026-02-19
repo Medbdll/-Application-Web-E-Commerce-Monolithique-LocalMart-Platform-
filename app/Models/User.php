@@ -70,12 +70,16 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-protected static function boot()
+
+    protected static function boot()
     {
         parent::boot();
 
         static::created(function ($user) {
-            $user->assignRole('client');
+            // Only assign role if it exists and user doesn't already have roles
+            if (\Spatie\Permission\Models\Role::where('name', 'client')->exists()) {
+                $user->assignRole('client');
+            }
         });
     }
     // Relationships
