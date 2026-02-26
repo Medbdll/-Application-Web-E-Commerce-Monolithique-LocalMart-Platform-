@@ -1,4 +1,4 @@
-# LocalMart E-Commerce Platform
+# VORTOX E-Commerce Platform
 
 A comprehensive monolithic e-commerce platform built with Laravel 11, featuring role-based access control, product management, shopping cart functionality, and order processing.
 
